@@ -7,24 +7,6 @@
 namespace SimWrap
 {
     // Implementation of Exception methods
-    Exception::Exception(const char *msg_)
-        : msg(msg_) {}
-    const char *Exception::what() const throw()
-    {
-        return msg;
-    }
-    void Exception::raise() const throw()
-    {
-        PyErr_SetString(PyExc_Exception, msg);
-    }
-
-    //Implementation of TypeError methods
-    TypeError::TypeError(const char *msg_)
-        : Exception(msg_) {}
-    void TypeError::raise() const throw()
-    {
-        PyErr_SetString(PyExc_TypeError, what());
-    }
 
     static void
     simulation_dealloc(SimulationObject *self)
