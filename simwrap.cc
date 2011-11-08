@@ -19,6 +19,19 @@ namespace SimWrap
         Py_DECREF(map);
     }
 
+    // Implementation of Function
+    Function::Function(const PyObject * pyfunc_)
+        : pyfunc(pyfunc_)
+    {
+        if (!PyCallable_Check((PyObject *)pyfunc))
+            throw TypeError("argument must be a mapping");
+        Py_INCREF(pyfunc);
+    }
+    Function::~Function()
+    {
+        Py_DECREF(pyfunc);
+    }
+
     static void
     simulation_dealloc(SimulationObject *self)
     {
