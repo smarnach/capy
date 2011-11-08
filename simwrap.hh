@@ -86,6 +86,16 @@ namespace SimWrap
         }
     }
 
+    template <typename T, T (Simulation::*method)()>
+    PyObject *
+    call_method(PyObject *self, PyObject *args)
+    {
+        if (!PyArg_ParseTuple(args, ""))
+            return 0;
+        T result = (((SimulationObject *)self)->simulation->*method)();
+        return convert_to_py(result);
+    }
+
     template <void (Simulation::*method)()>
     PyObject *
     call_method(PyObject *self, PyObject *args)
@@ -106,6 +116,13 @@ namespace SimWrap
         T arg1 = convert_from_py<T>(py_arg1);
         (((SimulationObject *)self)->simulation->*method)(arg1);
         Py_RETURN_NONE;
+    }
+
+    template <typename T, T (Simulation::*method)()>
+    PyObject *
+    wrap_method(PyObject *self, PyObject *args)
+    {
+        return check_call<call_method<T, method> >(self, args);
     }
 
     template <void (Simulation::*method)()>
