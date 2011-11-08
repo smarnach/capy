@@ -15,23 +15,10 @@ namespace SimWrap
         self->ob_type->tp_free((PyObject *)self);
     }
 
-    static PyObject *
-    simulation_do_time_step(SimulationObject *self, PyObject *args)
-    {
-        double time_step;
-        if (!PyArg_ParseTuple(args, "d:do_time_step", &time_step))
-            return 0;
-        try {
-            self->simulation->do_time_step(time_step);
-        }
-        catch (ExceptionInPythonAPI e) {
-            return 0;
-        }
-        Py_RETURN_NONE;
-    }
-
     static PyMethodDef simulation_methods[] = {
-        {"do_time_step", (PyCFunction)simulation_do_time_step, METH_VARARGS,
+        {"do_time_step",
+         (PyCFunction)wrap_method<double, &Simulation::do_time_step>,
+         METH_VARARGS,
          "Run a single time step of the simulation."},
         {0}  /* Sentinel */
     };
