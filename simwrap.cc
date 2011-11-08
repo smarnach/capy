@@ -20,7 +20,7 @@ namespace SimWrap
     }
 
     // Implementation of Function
-    Function::Function(const PyObject * pyfunc_)
+    Function::Function(const PyObject *pyfunc_)
         : pyfunc(pyfunc_)
     {
         if (!PyCallable_Check((PyObject *)pyfunc))

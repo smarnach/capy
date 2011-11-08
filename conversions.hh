@@ -25,7 +25,7 @@ namespace SimWrap
     class Function
     {
     public:
-        Function(const PyObject * pyfunc_);
+        Function(const PyObject *pyfunc_);
         ~Function();
         template <typename RT>
         RT call();
@@ -154,20 +154,20 @@ namespace SimWrap
     RT Function::call(T1 arg1)
     {
         return convert_from_py<RT>(PyObject_CallFunctionObjArgs(
-            (PyObject *)pyfunc, convert_to_py(arg1)));
+            (PyObject *)pyfunc, convert_to_py(arg1), 0));
     }
     template <typename RT, typename T1, typename T2>
     RT Function::call(T1 arg1, T2 arg2)
     {
         return convert_from_py<RT>(PyObject_CallFunctionObjArgs(
-            (PyObject *)pyfunc, convert_to_py(arg1), convert_to_py(arg2)));
+            (PyObject *)pyfunc, convert_to_py(arg1), convert_to_py(arg2), 0));
     }
     template <typename RT, typename T1, typename T2, typename T3>
     RT Function::call(T1 arg1, T2 arg2, T3 arg3)
     {
         return convert_from_py<RT>(PyObject_CallFunctionObjArgs(
             (PyObject *)pyfunc, convert_to_py(arg1), convert_to_py(arg2),
-            convert_to_py(arg3)));
+            convert_to_py(arg3), 0));
     }
 }
 
