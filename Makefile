@@ -6,4 +6,4 @@ LDLIBS = -lpython2.7
 samplesim.so: simwrap.o samplesim.o
 	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-simwrap.o samplesim.o: simwrap.hh
+simwrap.o samplesim.o: simwrap.hh conversions.hh exceptions.hh
