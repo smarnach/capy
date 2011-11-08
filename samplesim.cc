@@ -5,7 +5,7 @@ namespace SimWrap
     class MySimulation : public Simulation
     {
     public:
-        MySimulation(const Config& config_)
+        MySimulation(const Mapping& config_)
             : Simulation(config_)
         {
             config.get("b", b);

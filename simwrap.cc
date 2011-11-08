@@ -6,7 +6,18 @@
 
 namespace SimWrap
 {
-    // Implementation of Exception methods
+    // Implementation of Mapping
+    Mapping::Mapping(PyObject *map_)
+        : map(map_)
+    {
+        if (!PyMapping_Check(map))
+            throw TypeError("argument must be a mapping");
+        Py_INCREF(map);
+    }
+    Mapping::~Mapping()
+    {
+        Py_DECREF(map);
+    }
 
     static void
     simulation_dealloc(SimulationObject *self)

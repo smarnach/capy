@@ -10,50 +10,20 @@
 
 namespace SimWrap
 {
-    // Simple wrapper around Python mapping types
-    class Config
-    {
-    public:
-        Config(PyObject *map_)
-            : map(map_)
-        {
-            Py_INCREF(map);
-        }
-        ~Config()
-        {
-            Py_DECREF(map);
-        }
-        template <typename T>
-        void get(const char *key, T &value) const
-        {
-            PyObject *obj = PyMapping_GetItemString(map, const_cast<char *>(key));
-            if (!obj)
-                throw ExceptionInPythonAPI();
-            value = convert_from_py<T>(obj);
-        }
-        template <typename T>
-        void set(const char *key, T value) const
-        {
-            if (PyMapping_SetItemString(
-                    map, const_cast<char *>(key), convert_to_py(value)) == -1)
-                throw ExceptionInPythonAPI();
-        }
-    private:
-        PyObject *const map;
-    };
-
     class Simulation
     {
     public:
-        Simulation(const Config& config_)
+        Simulation(const Mapping& config_)
             : config(config_)
         {}
         virtual ~Simulation()
         {}
         virtual void do_time_step(double time_step)
         {}
+        void get_unknowns()
+        {}
     protected:
-        Config config;
+        Mapping config;
     };
 
     typedef struct
@@ -143,7 +113,7 @@ namespace SimWrap
     PyObject *
     simulation_new_helper(PyObject *self, PyObject *map)
     {
-        Config config(map);
+        Mapping config(map);
         ((SimulationObject *)self)->simulation = new(std::nothrow) Sim(config);
         if (!((SimulationObject *)self)->simulation) {
             Py_DECREF(self);
@@ -163,10 +133,6 @@ namespace SimWrap
         if (!PyArg_ParseTupleAndKeywords(
                 args, kwargs, "O:Simulation", kwlist, &map))
             return 0;
-        if (!PyMapping_Check(map)) {
-            PyErr_SetString(PyExc_TypeError, "argument must be a mapping");
-            return 0;
-        }
         PyObject *sim = type->tp_alloc(type, 0);
         if (!sim)
             return 0;
