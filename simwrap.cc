@@ -41,9 +41,13 @@ namespace SimWrap
 
     static PyMethodDef simulation_methods[] = {
         {"do_time_step",
-         (PyCFunction)wrap_method<double, &Simulation::do_time_step>,
+         wrap_method<double, &Simulation::do_time_step>,
          METH_VARARGS,
          "Run a single time step of the simulation."},
+        {"write_output",
+         wrap_method<const char*, &Simulation::write_output>,
+         METH_VARARGS,
+         "Write output to the given file name."},
         {0}  /* Sentinel */
     };
 

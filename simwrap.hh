@@ -20,7 +20,7 @@ namespace SimWrap
         {}
         virtual void do_time_step(double time_step)
         {}
-        void get_unknowns()
+        virtual void write_output(const char *filename)
         {}
     protected:
         Mapping config;

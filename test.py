@@ -12,5 +12,6 @@ class Config:
 
 sim = samplesim.MySimulation(vars(Config))
 sim.do_time_step(0.1)
+sim.write_output("test1.out")
 Config.verbose = False
-sim.do_time_step(0.05)
+sim.write_output("test2.out")

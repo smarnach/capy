@@ -1,5 +1,10 @@
 #include "simwrap.hh"
 
+#include <vector>
+#include <fstream>
+#include <iostream>
+#include <iomanip>
+
 namespace SimWrap
 {
     class MySimulation : public Simulation
@@ -9,30 +14,39 @@ namespace SimWrap
             : Simulation(config_), f(config.get<Function>("f"))
         {}
 
-        void
-        do_time_step(double time_step)
+        virtual void do_time_step(double time_step)
         {
-            config.get("name", name);
-            config.get("verbose", verbose);
+            double x0, x1;
             config.get("x0", x0);
             config.get("x1", x1);
-            double x = x0;
-            while (x < x1 + time_step*1e-10)
+            x.clear();
+            y.clear();
+            for (double t = x0; t < x1 + time_step*1e-10; t += time_step)
             {
-                double y = f.call<double>(x);
-                if (verbose)
-                    printf("%s(%12g) = %12g\n", name, x, y);
-                else
-                    printf("%12g\n", y);
-                x += time_step;
+                x.push_back(t);
+                y.push_back(f.call<double>(t));
             }
         }
 
+        virtual void write_output(const char *filename)
+        {
+            const char *name;
+            bool verbose;
+            config.get("verbose", verbose);
+            if (verbose)
+                config.get("name", name);
+            std::ofstream file(filename);
+            for (unsigned i = 0; i < y.size(); ++i)
+                if (verbose)
+                    file << name << "(" << std::setw(12) << x[i] << ") = "
+                         << std::setw(12) << y[i] << "\n";
+                else
+                    file << std::setw(12) << y[i] << "\n";
+        }
     private:
         Function f;
-        const char *name;
-        bool verbose;
-        double x0, x1;
+        std::vector<double> x;
+        std::vector<double> y;
     };
 
     PyMODINIT_FUNC
