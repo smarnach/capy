@@ -144,7 +144,8 @@ namespace SimWrap
     PyObject *init_simulation_module(const char *name, const char *doc);
 
     template <typename Sim> void
-    add_simulation_type(PyObject *module, const char *type_name, const char *doc)
+    add_simulation_type(PyObject *module, const char *type_name, const char *doc,
+        PyMethodDef *methods = 0)
     {
         if (!module)
             return;
@@ -164,6 +165,7 @@ namespace SimWrap
             new_type->tp_name = type_name;
         }
         new_type->tp_doc = doc;
+        new_type->tp_methods = methods;
         new_type->tp_base = &SimulationType;
         new_type->tp_new = simulation_new<Sim>;
         if (PyType_Ready(new_type) == -1)
