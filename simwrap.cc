@@ -54,7 +54,15 @@ namespace SimWrap
     simulation_dealloc(SimulationObject *self)
     {
         delete self->simulation;
+        PyObject_GC_UnTrack(self);
         self->ob_type->tp_free((PyObject *)self);
+    }
+
+    static int
+    simulation_traverse(SimulationObject *self, visitproc visit, void *arg)
+    {
+        Py_VISIT(self->simulation->config.get_python_mapping());
+        return 0;
     }
 
     static PyMethodDef simulation_methods[] = {
@@ -108,9 +116,10 @@ namespace SimWrap
         0,                         /* tp_getattro */
         0,                         /* tp_setattro */
         0,                         /* tp_as_buffer */
-        Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /* tp_flags */
+        Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE |
+        Py_TPFLAGS_HAVE_GC,        /* tp_flags */
         simulation_doc,            /* tp_doc */
-        0,                         /* tp_traverse */
+        (traverseproc)simulation_traverse, /* tp_traverse */
         0,                         /* tp_clear */
         0,                         /* tp_richcompare */
         0,                         /* tp_weaklistoffset */
