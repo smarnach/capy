@@ -14,9 +14,18 @@ namespace SimWrap
             throw TypeError("argument must be a mapping");
         Py_INCREF(map);
     }
+    Mapping::Mapping(const Mapping &other)
+        : map(other.map)
+    {
+        Py_INCREF(map);
+    }
     Mapping::~Mapping()
     {
         Py_DECREF(map);
+    }
+    PyObject *Mapping::get_python_mapping() const
+    {
+        return map;
     }
 
     // Implementation of Function
@@ -24,7 +33,12 @@ namespace SimWrap
         : pyfunc(pyfunc_)
     {
         if (!PyCallable_Check((PyObject *)pyfunc))
-            throw TypeError("argument must be a mapping");
+            throw TypeError("argument must be callable");
+        Py_INCREF(pyfunc);
+    }
+    Function::Function(const Function &other)
+        : pyfunc(other.pyfunc)
+    {
         Py_INCREF(pyfunc);
     }
     Function::~Function()

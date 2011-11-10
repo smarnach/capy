@@ -10,6 +10,7 @@ namespace SimWrap
     {
     public:
         Mapping(PyObject *map_);
+        Mapping(const Mapping &other);
         ~Mapping();
         template <typename T>
         T get(const char *key) const;
@@ -19,6 +20,7 @@ namespace SimWrap
         void set(const char *key, T value) const;
     private:
         PyObject *const map;
+        Mapping &operator=(const Mapping &other);
     };
 
     // Simple wrapper for Python functions
@@ -26,6 +28,7 @@ namespace SimWrap
     {
     public:
         Function(const PyObject *pyfunc_);
+        Function(const Function &other);
         ~Function();
         template <typename RT>
         RT call();
@@ -37,6 +40,7 @@ namespace SimWrap
         RT call(T1 arg1, T2 arg2, T3 arg3);
     private:
         const PyObject *pyfunc;
+        Function &operator=(const Function &other);
     };
 
     // Convert basic Python types to the corresponding C++ type
