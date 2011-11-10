@@ -29,7 +29,7 @@ namespace SimWrap
     class Function
     {
     public:
-        Function(const PyObject *pyfunc_);
+        Function(PyObject *pyfunc_);
         Function(const Function &other);
         ~Function();
         template <typename RT>
@@ -41,7 +41,7 @@ namespace SimWrap
         template <typename RT, typename T1, typename T2, typename T3>
         RT call(T1 arg1, T2 arg2, T3 arg3);
     private:
-        const PyObject *pyfunc;
+        PyObject *const pyfunc;
         Function &operator=(const Function &other);
     };
 
@@ -154,25 +154,25 @@ namespace SimWrap
     template <typename RT>
     RT Function::call()
     {
-        return convert_from_py<RT>(PyObject_CallObject((PyObject *)pyfunc, 0));
+        return convert_from_py<RT>(PyObject_CallObject(pyfunc, 0));
     }
     template <typename RT, typename T1>
     RT Function::call(T1 arg1)
     {
         return convert_from_py<RT>(PyObject_CallFunctionObjArgs(
-            (PyObject *)pyfunc, convert_to_py(arg1), 0));
+            pyfunc, convert_to_py(arg1), 0));
     }
     template <typename RT, typename T1, typename T2>
     RT Function::call(T1 arg1, T2 arg2)
     {
         return convert_from_py<RT>(PyObject_CallFunctionObjArgs(
-            (PyObject *)pyfunc, convert_to_py(arg1), convert_to_py(arg2), 0));
+            pyfunc, convert_to_py(arg1), convert_to_py(arg2), 0));
     }
     template <typename RT, typename T1, typename T2, typename T3>
     RT Function::call(T1 arg1, T2 arg2, T3 arg3)
     {
         return convert_from_py<RT>(PyObject_CallFunctionObjArgs(
-            (PyObject *)pyfunc, convert_to_py(arg1), convert_to_py(arg2),
+            pyfunc, convert_to_py(arg1), convert_to_py(arg2),
             convert_to_py(arg3), 0));
     }
 }

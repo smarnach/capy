@@ -33,10 +33,10 @@ namespace SimWrap
     }
 
     // Implementation of Function
-    Function::Function(const PyObject *pyfunc_)
+    Function::Function(PyObject *pyfunc_)
         : pyfunc(pyfunc_)
     {
-        if (!PyCallable_Check((PyObject *)pyfunc))
+        if (!PyCallable_Check(pyfunc))
             throw TypeError("argument must be callable");
         Py_INCREF(pyfunc);
     }
