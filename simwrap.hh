@@ -6,7 +6,7 @@
 #include <new>
 
 #include "exceptions.hh"
-#include "conversions.hh"
+#include "types.hh"
 
 namespace SimWrap
 {

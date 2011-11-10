@@ -1,5 +1,5 @@
-#ifndef SIMWRAP_CONVERSIONS_HH
-#define SIMWRAP_CONVERSIONS_HH
+#ifndef SIMWRAP_TYPES_HH
+#define SIMWRAP_TYPES_HH
 
 #include <Python.h>
 
