@@ -141,7 +141,8 @@ namespace SimWrap
 
     extern PyTypeObject SimulationType;
 
-    PyObject *init_simulation_module(const char *name, const char *doc);
+    PyObject *init_simulation_module(const char *name, const char *doc,
+                                     PyMethodDef *methods = 0);
 
     template <typename Sim> void
     add_simulation_type(PyObject *module, const char *type_name, const char *doc,

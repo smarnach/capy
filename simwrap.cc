@@ -110,14 +110,11 @@ namespace SimWrap
         simulation_new<Simulation>, /* tp_new */
     };
 
-    static PyMethodDef simwrap_methods[] = {
-        {0}  /* Sentinel */
-    };
-
     PyObject *
-    init_simulation_module(const char *mod_name, const char *doc)
+    init_simulation_module(const char *mod_name, const char *doc,
+                           PyMethodDef *methods)
     {
-        PyObject *m = Py_InitModule3(mod_name, simwrap_methods, doc);
+        PyObject *m = Py_InitModule3(mod_name, methods, doc);
         if (!m)
             return 0;
         char *qname = new char[256];
