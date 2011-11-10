@@ -16,9 +16,8 @@ namespace SimWrap
 
         virtual void do_time_step(double time_step)
         {
-            double x0, x1;
-            config.get("x0", x0);
-            config.get("x1", x1);
+            double x0 = config.get("x0", 0.0);
+            double x1 = config.get("x1", 1.0);
             x.clear();
             y.clear();
             for (double t = x0; t < x1 + time_step*1e-10; t += time_step)
@@ -31,10 +30,9 @@ namespace SimWrap
         virtual void write_output(const char *filename)
         {
             const char *name;
-            bool verbose;
-            config.get("verbose", verbose);
+            bool verbose = config.get("verbose", false);
             if (verbose)
-                config.get("name", name);
+                name = config.get<const char*>("name");
             std::ofstream file(filename);
             for (unsigned i = 0; i < y.size(); ++i)
                 if (verbose)

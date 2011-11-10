@@ -15,7 +15,7 @@ namespace SimWrap
         template <typename T>
         T get(const char *key) const;
         template <typename T>
-        void get(const char *key, T &value) const;
+        T get(const char *key, T default_value) const;
         template <typename T>
         void set(const char *key, T value) const;
         bool has_key(const char *key) const;
@@ -138,9 +138,11 @@ namespace SimWrap
         return convert_from_py<T>(obj);
     }
     template <typename T>
-    void Mapping::get(const char *key, T &value) const
+    T Mapping::get(const char *key, T default_value) const
     {
-        value = get<T>(key);
+        if (has_key(key))
+            return get<T>(key);
+        return default_value;
     }
     template <typename T>
     void Mapping::set(const char *key, T value) const
