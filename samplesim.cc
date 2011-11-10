@@ -11,7 +11,9 @@ namespace SimWrap
     {
     public:
         MySimulation(const Mapping& config_)
-            : Simulation(config_), f(config.get<Function>("f"))
+            : Simulation(config_),
+              f(config.get<Function>(
+                    "f", eval_py_expr<Function>("lambda x: x * x")))
         {}
 
         virtual void do_time_step(double time_step)

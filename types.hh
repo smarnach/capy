@@ -128,6 +128,19 @@ namespace SimWrap
         return obj;
     }
 
+    template <typename T>
+    T eval_py_expr(const char *expr)
+    {
+        PyObject *globals = PyEval_GetGlobals();
+        PyObject *locals = PyEval_GetLocals();
+        if (!locals || !globals)
+            throw ExceptionInPythonAPI();
+        PyObject *result = PyRun_String(expr, Py_eval_input, globals, locals);
+        if (!result)
+            throw ExceptionInPythonAPI();
+        return convert_from_py<T>(result);
+    }
+
     // Implementation of Mapping
     template <typename T>
     T Mapping::get(const char *key) const
