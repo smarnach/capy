@@ -113,6 +113,7 @@ namespace SimWrap
     simulation_new_helper(PyObject *self, PyObject *map)
     {
         Mapping config(map);
+        Py_DECREF(map);
         ((SimulationObject *)self)->simulation = new(std::nothrow) Sim(config);
         if (!((SimulationObject *)self)->simulation) {
             Py_DECREF(self);
@@ -127,14 +128,28 @@ namespace SimWrap
     PyObject *
     simulation_new(PyTypeObject *type, PyObject *args, PyObject *kwargs)
     {
-        PyObject *map;
-        static char *kwlist[] = {(char *)"config", 0};
-        if (!PyArg_ParseTupleAndKeywords(
-                args, kwargs, "O:Simulation", kwlist, &map))
+        PyObject *map = 0;
+        if (!PyArg_ParseTuple(args, "|O:Simulation", &map))
             return 0;
+        if (!map && !kwargs) {
+            map = PyDict_New();
+            if (!map)
+                return 0;
+        }
+        else {
+            if (map && kwargs)
+                if (!PyObject_CallMethod(map, (char *)"update",
+                                         (char *)"O", kwargs))
+                    return 0;
+            if (!map)
+                map = kwargs;
+            Py_INCREF(map);
+        }
         PyObject *sim = type->tp_alloc(type, 0);
-        if (!sim)
+        if (!sim) {
+            Py_DECREF(map);
             return 0;
+        }
         return check_call<simulation_new_helper<Sim> >(sim, map);
     }
 
