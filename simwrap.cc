@@ -23,6 +23,10 @@ namespace SimWrap
     {
         Py_DECREF(map);
     }
+    bool Mapping::has_key(const char *key) const
+    {
+        return PyMapping_HasKeyString(map, const_cast<char *>(key));
+    }
     PyObject *Mapping::get_python_mapping() const
     {
         return map;

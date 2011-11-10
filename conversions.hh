@@ -18,6 +18,7 @@ namespace SimWrap
         void get(const char *key, T &value) const;
         template <typename T>
         void set(const char *key, T value) const;
+        bool has_key(const char *key) const;
         PyObject *get_python_mapping() const;
     private:
         PyObject *const map;
