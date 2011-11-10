@@ -55,14 +55,14 @@ namespace SimWrap
         }
     }
 
-    template <typename T, T (Simulation::*method)()>
+    template <typename RT, RT (Simulation::*method)()>
     PyObject *
     call_method(PyObject *self, PyObject *args)
     {
         if (!PyArg_ParseTuple(args, ""))
             return 0;
-        T result = (((SimulationObject *)self)->simulation->*method)();
-        return convert_to_py(result);
+        return convert_to_py(
+            (((SimulationObject *)self)->simulation->*method)());
     }
 
     template <void (Simulation::*method)()>
@@ -75,6 +75,17 @@ namespace SimWrap
         Py_RETURN_NONE;
     }
 
+    template <typename RT, typename T, RT (Simulation::*method)(T)>
+    PyObject *
+    call_method(PyObject *self, PyObject *args)
+    {
+        PyObject *py_arg1;
+        if (!PyArg_ParseTuple(args, "O", &py_arg1))
+            return 0;
+        return convert_to_py((((SimulationObject *)self)->simulation->*method)
+                             (convert_from_py<T>(py_arg1)));
+    }
+
     template <typename T, void (Simulation::*method)(T)>
     PyObject *
     call_method(PyObject *self, PyObject *args)
@@ -82,16 +93,16 @@ namespace SimWrap
         PyObject *py_arg1;
         if (!PyArg_ParseTuple(args, "O", &py_arg1))
             return 0;
-        T arg1 = convert_from_py<T>(py_arg1);
-        (((SimulationObject *)self)->simulation->*method)(arg1);
+        (((SimulationObject *)self)->simulation->*method)(
+            convert_from_py<T>(py_arg1));
         Py_RETURN_NONE;
     }
 
-    template <typename T, T (Simulation::*method)()>
+    template <typename RT, RT (Simulation::*method)()>
     PyObject *
     wrap_method(PyObject *self, PyObject *args)
     {
-        return check_call<call_method<T, method> >(self, args);
+        return check_call<call_method<RT, method> >(self, args);
     }
 
     template <void (Simulation::*method)()>
@@ -99,6 +110,13 @@ namespace SimWrap
     wrap_method(PyObject *self, PyObject *args)
     {
         return check_call<call_method<method> >(self, args);
+    }
+
+    template <typename RT, typename T, RT (Simulation::*method)(T)>
+    PyObject *
+    wrap_method(PyObject *self, PyObject *args)
+    {
+        return check_call<call_method<RT, T, method> >(self, args);
     }
 
     template <typename T, void (Simulation::*method)(T)>
