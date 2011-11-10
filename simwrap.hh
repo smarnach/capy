@@ -22,7 +22,6 @@ namespace SimWrap
         {}
         virtual void write_output(const char *filename)
         {}
-    protected:
         Mapping config;
     };
 

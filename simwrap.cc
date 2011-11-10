@@ -65,6 +65,21 @@ namespace SimWrap
         {0}  /* Sentinel */
     };
 
+    static PyObject *
+    simulation_get_config(PyObject *self, void *)
+    {
+        PyObject *map = ((SimulationObject *)self)->
+            simulation->config.get_python_mapping();
+        Py_INCREF(map);
+        return map;
+    }
+
+    static PyGetSetDef simulation_getset[] = {
+        {(char *)"config", simulation_get_config, 0,
+         (char *)"config attribute", 0},
+        {0}  /* Sentinel */
+    };
+
     const char *simulation_doc =
         "Base object for simulation wrappers.";
 
@@ -99,7 +114,7 @@ namespace SimWrap
         0,                         /* tp_iternext */
         simulation_methods,        /* tp_methods */
         0,                         /* tp_members */
-        0,                         /* tp_getset */
+        simulation_getset,         /* tp_getset */
         0,                         /* tp_base */
         0,                         /* tp_dict */
         0,                         /* tp_descr_get */
