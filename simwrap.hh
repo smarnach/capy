@@ -38,21 +38,20 @@ namespace SimWrap
         try {
             return f(self, args);
         }
-        catch (ExceptionInPythonAPI e) {
-            return 0;
-        }
-        catch (Exception e) {
+        catch (ExceptionInPythonAPI &e) {}
+        catch (Exception &e) {
             e.raise();
-            return 0;
         }
-        catch (std::exception e) {
+        catch (std::bad_alloc &e) {
+            MemoryError("Failed memory allocation in C++ code").raise();
+        }
+        catch (std::exception &e) {
             RuntimeError(e.what()).raise();
-            return 0;
         }
         catch (...) {
             RuntimeError("Unknown C++ exception occurred").raise();
-            return 0;
         }
+        return 0;
     }
 
     template <typename RT, RT (Simulation::*method)()>
@@ -132,12 +131,12 @@ namespace SimWrap
     {
         Mapping config(map);
         Py_DECREF(map);
-        ((SimulationObject *)self)->simulation = new(std::nothrow) Sim(config);
-        if (!((SimulationObject *)self)->simulation) {
+        try {
+            ((SimulationObject *)self)->simulation = new Sim(config);
+        }
+        catch (...) {
             Py_DECREF(self);
-            PyErr_SetString(PyExc_MemoryError,
-                            "could not allocate Simulation object");
-            return 0;
+            throw;
         }
         return self;
     }
