@@ -9,7 +9,7 @@ namespace SimWrap
     class Mapping
     {
     public:
-        Mapping(PyObject *map_);
+        explicit Mapping(PyObject *map_);
         Mapping(const Mapping &other);
         ~Mapping();
         template <typename T>
@@ -29,7 +29,7 @@ namespace SimWrap
     class Function
     {
     public:
-        Function(PyObject *pyfunc_);
+        explicit Function(PyObject *pyfunc_);
         Function(const Function &other);
         ~Function();
         template <typename RT>
