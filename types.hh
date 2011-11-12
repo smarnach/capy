@@ -13,8 +13,7 @@ namespace SimWrap
         explicit Object(PyObject *obj_)
             : obj(obj_)
         {
-            if (!obj)
-                throw ExceptionInPythonAPI();
+            check_error(obj);
         }
         Object(const Object &other)
             : obj(other.obj)
@@ -31,48 +30,33 @@ namespace SimWrap
         Object(long value)
             : obj(PyInt_FromLong(value))
         {
-            if (!obj)
-                throw ExceptionInPythonAPI();
+            check_error(obj);
         }
         Object(double value)
             : obj(PyFloat_FromDouble(value))
         {
-            if (!obj)
-                throw ExceptionInPythonAPI();
+            check_error(obj);
         }
         Object(const char *value)
             : obj(PyString_FromString(value))
         {
-            if (!obj)
-                throw ExceptionInPythonAPI();
+            check_error(obj);
         }
         operator bool() const
         {
-            bool res = PyObject_IsTrue(obj);
-            if (res == -1)
-                throw ExceptionInPythonAPI();
-            return res;
+            return check_error(PyObject_IsTrue(obj));
         }
         operator long() const
         {
-            long res = PyInt_AsLong(obj);
-            if (res == -1 && PyErr_Occurred())
-                throw ExceptionInPythonAPI();
-            return res;
+            return check_error(PyInt_AsLong(obj));
         }
         operator double() const
         {
-            double res = PyFloat_AsDouble(obj);
-            if (res == -1 && PyErr_Occurred())
-                throw ExceptionInPythonAPI();
-            return res;
+            return check_error(PyFloat_AsDouble(obj));
         }
         operator const char *() const
         {
-            const char *res = PyString_AsString(obj);
-            if (!res)
-                throw ExceptionInPythonAPI();
-            return res;
+            return check_error(PyString_AsString(obj));
         }
         operator PyObject *() const
         {
@@ -150,9 +134,8 @@ namespace SimWrap
         }
         void set(const char *key, const Object &value) const
         {
-            if (PyMapping_SetItemString(
-                    obj, const_cast<char *>(key), value) == -1)
-                throw ExceptionInPythonAPI();
+            check_error(PyMapping_SetItemString(
+                            obj, const_cast<char *>(key), value));
         }
         bool has_key(const char *key) const
         {
@@ -162,10 +145,8 @@ namespace SimWrap
 
     inline Object eval_py_expr(const char *expr)
     {
-        PyObject *globals = PyEval_GetGlobals();
-        PyObject *locals = PyEval_GetLocals();
-        if (!locals || !globals)
-            throw ExceptionInPythonAPI();
+        PyObject *globals = check_error(PyEval_GetGlobals());
+        PyObject *locals = check_error(PyEval_GetLocals());
         return Object(PyRun_String(expr, Py_eval_input, globals, locals));
     }
 }

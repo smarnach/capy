@@ -16,6 +16,51 @@ namespace SimWrap
     // information.
     class ExceptionInPythonAPI : public std::exception {};
 
+    inline PyObject *check_error(PyObject *obj)
+    {
+        if (!obj)
+            throw ExceptionInPythonAPI();
+        return obj;
+    }
+    inline bool check_error(bool value)
+    {
+        if (value == -1)
+            throw ExceptionInPythonAPI();
+        return value;
+    }
+    inline int check_error(int value)
+    {
+        if (value == -1)
+            throw ExceptionInPythonAPI();
+        return value;
+    }
+#if __SIZEOF_SIZE_T__ != __SIZEOF_INT__
+    inline ssize_t check_error(ssize_t value)
+    {
+        if (value == -1)
+            throw ExceptionInPythonAPI();
+        return value;
+    }
+#endif
+    inline long check_error(long value)
+    {
+        if (value == -1 && PyErr_Occurred())
+            throw ExceptionInPythonAPI();
+        return value;
+    }
+    inline double check_error(double value)
+    {
+        if (value == -1 && PyErr_Occurred())
+            throw ExceptionInPythonAPI();
+        return value;
+    }
+    inline const char *check_error(const char *value)
+    {
+        if (!value)
+            throw ExceptionInPythonAPI();
+        return value;
+    }
+
     class Exception :  public std::exception
     {
     public:
