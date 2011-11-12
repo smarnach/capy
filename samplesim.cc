@@ -10,7 +10,7 @@ class MySimulation : public SimWrap::Simulation
 public:
     MySimulation(const SimWrap::Mapping& config_)
         : Simulation(config_),
-          f(config.get("f", SimWrap::eval_py_expr("lambda x: x * x")))
+          f(config.get("f", SimWrap::eval("lambda x: x * x")))
     {}
 
     virtual void do_time_step(double time_step)

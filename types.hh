@@ -146,13 +146,6 @@ namespace SimWrap
             return PyMapping_HasKeyString(obj, const_cast<char *>(key));
         }
     };
-
-    inline Object eval_py_expr(const char *expr)
-    {
-        PyObject *globals = check_error(PyEval_GetGlobals());
-        PyObject *locals = check_error(PyEval_GetLocals());
-        return Object(PyRun_String(expr, Py_eval_input, globals, locals));
-    }
 }
 
 #endif
