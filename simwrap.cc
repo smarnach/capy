@@ -45,7 +45,7 @@ namespace SimWrap
         {0}  /* Sentinel */
     };
 
-    const char *simulation_doc =
+    static const char *simulation_doc =
         "Base object for simulation wrappers.";
 
     PyTypeObject SimulationType = {
