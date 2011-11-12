@@ -31,9 +31,9 @@ namespace SimWrap
         Simulation *simulation;
     } SimulationObject;
 
-    template <PyCFunction f>
+    template <PyObject *(*f)(SimulationObject *, PyObject *)>
     PyObject *
-    check_call(PyObject *self, PyObject *args)
+    check_call(SimulationObject *self, PyObject *args)
     {
         try {
             return f(self, args);
@@ -56,44 +56,43 @@ namespace SimWrap
 
     template <typename RT, RT (Simulation::*method)()>
     PyObject *
-    call_method(PyObject *self, PyObject *args)
+    call_method(SimulationObject *self, PyObject *args)
     {
         if (!PyArg_ParseTuple(args, ""))
             return 0;
-        return Object((((SimulationObject *)self)->simulation->*method)());
+        return Object((self->simulation->*method)());
     }
 
     template <void (Simulation::*method)()>
     PyObject *
-    call_method(PyObject *self, PyObject *args)
+    call_method(SimulationObject *self, PyObject *args)
     {
         if (!PyArg_ParseTuple(args, ""))
             return 0;
-        (((SimulationObject *)self)->simulation->*method)();
+        (self->simulation->*method)();
         Py_RETURN_NONE;
     }
 
     template <typename RT, typename T, RT (Simulation::*method)(T)>
     PyObject *
-    call_method(PyObject *self, PyObject *args)
+    call_method(SimulationObject *self, PyObject *args)
     {
         PyObject *py_arg1;
         if (!PyArg_ParseTuple(args, "O", &py_arg1))
             return 0;
         Py_INCREF(py_arg1);
-        return Object((((SimulationObject *)self)->simulation->*method)
-                      (Object(py_arg1)));
+        return Object((self->simulation->*method)(Object(py_arg1)));
     }
 
     template <typename T, void (Simulation::*method)(T)>
     PyObject *
-    call_method(PyObject *self, PyObject *args)
+    call_method(SimulationObject *self, PyObject *args)
     {
         PyObject *py_arg1;
         if (!PyArg_ParseTuple(args, "O", &py_arg1))
             return 0;
         Py_INCREF(py_arg1);
-        (((SimulationObject *)self)->simulation->*method)(Object(py_arg1));
+        (self->simulation->*method)(Object(py_arg1));
         Py_RETURN_NONE;
     }
 
@@ -101,43 +100,47 @@ namespace SimWrap
     PyObject *
     wrap_method(PyObject *self, PyObject *args)
     {
-        return check_call<call_method<RT, method> >(self, args);
+        return check_call<call_method<RT, method> >(
+            (SimulationObject *)self, args);
     }
 
     template <void (Simulation::*method)()>
     PyObject *
     wrap_method(PyObject *self, PyObject *args)
     {
-        return check_call<call_method<method> >(self, args);
+        return check_call<call_method<method> >(
+            (SimulationObject *)self, args);
     }
 
     template <typename RT, typename T, RT (Simulation::*method)(T)>
     PyObject *
     wrap_method(PyObject *self, PyObject *args)
     {
-        return check_call<call_method<RT, T, method> >(self, args);
+        return check_call<call_method<RT, T, method> >(
+            (SimulationObject *)self, args);
     }
 
     template <typename T, void (Simulation::*method)(T)>
     PyObject *
     wrap_method(PyObject *self, PyObject *args)
     {
-        return check_call<call_method<T, method> >(self, args);
+        return check_call<call_method<T, method> >(
+            (SimulationObject *)self, args);
     }
 
     template <typename Sim>
     PyObject *
-    simulation_new_helper(PyObject *self, PyObject *map)
+    simulation_new_helper(SimulationObject *self, PyObject *map)
     {
         Mapping config(map);
         try {
-            ((SimulationObject *)self)->simulation = new Sim(config);
+            self->simulation = new Sim(config);
         }
         catch (...) {
             Py_DECREF(self);
             throw;
         }
-        return self;
+        return (PyObject *)self;
     }
 
     template <typename Sim>
@@ -161,7 +164,7 @@ namespace SimWrap
                 map = kwargs;
             Py_INCREF(map);
         }
-        PyObject *sim = type->tp_alloc(type, 0);
+        SimulationObject *sim = (SimulationObject *)type->tp_alloc(type, 0);
         if (!sim) {
             Py_DECREF(map);
             return 0;
