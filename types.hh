@@ -137,6 +137,10 @@ namespace SimWrap
             check_error(PyMapping_SetItemString(
                             obj, const_cast<char *>(key), value));
         }
+        void del(const char *key) const
+        {
+            check_error(PyMapping_DelItemString(obj, const_cast<char *>(key)));
+        }
         bool has_key(const char *key) const
         {
             return PyMapping_HasKeyString(obj, const_cast<char *>(key));
