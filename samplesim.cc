@@ -24,7 +24,7 @@ namespace SimWrap
             for (double t = x0; t < x1 + time_step*1e-10; t += time_step)
             {
                 x.push_back(t);
-                y.push_back(f.call(t));
+                y.push_back(f(t));
             }
         }
 
@@ -43,7 +43,7 @@ namespace SimWrap
                     file << std::setw(12) << y[i] << "\n";
         }
     private:
-        Function f;
+        Object f;
         std::vector<double> x;
         std::vector<double> y;
     };

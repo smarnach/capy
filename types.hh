@@ -83,6 +83,40 @@ namespace SimWrap
             Py_INCREF(obj);
             return obj;
         }
+        bool callable() const
+        {
+            return PyCallable_Check(obj);
+        }
+        Object operator()() const
+        {
+            return Object(PyObject_CallObject(obj, 0));
+        }
+        Object operator()(Object arg1) const
+        {
+            return Object(PyObject_CallFunctionObjArgs(obj,
+                                                       (PyObject *)arg1, 0));
+        }
+        Object operator()(Object arg1, Object arg2) const
+        {
+            return Object(PyObject_CallFunctionObjArgs(obj,
+                                                       (PyObject *)arg1,
+                                                       (PyObject *)arg2, 0));
+        }
+        Object operator()(Object arg1, Object arg2, Object arg3) const
+        {
+            return Object(PyObject_CallFunctionObjArgs(obj,
+                                                       (PyObject *)arg1,
+                                                       (PyObject *)arg2,
+                                                       (PyObject *)arg3, 0));
+        }
+        Object operator()(Object arg1, Object arg2, Object arg3, Object arg4) const
+        {
+            return Object(PyObject_CallFunctionObjArgs(obj,
+                                                       (PyObject *)arg1,
+                                                       (PyObject *)arg2,
+                                                       (PyObject *)arg3,
+                                                       (PyObject *)arg4, 0));
+        }
     protected:
         PyObject *const obj;
     };
@@ -123,54 +157,6 @@ namespace SimWrap
         bool has_key(const char *key) const
         {
             return PyMapping_HasKeyString(obj, const_cast<char *>(key));
-        }
-    };
-
-    // Simple wrapper for Python functions
-    class Function : public Object
-    {
-    public:
-        explicit Function(PyObject *obj_)
-            : Object(obj_)
-        {
-            if (!PyCallable_Check(obj))
-                throw TypeError("argument must be callable");
-        }
-        Function(const Object &other)
-            : Object(other)
-        {
-            if (!PyCallable_Check(obj))
-                throw TypeError("argument must be callable");
-        }
-        Object call()
-        {
-            return Object(PyObject_CallObject(obj, 0));
-        }
-        Object call(Object arg1)
-        {
-            return Object(PyObject_CallFunctionObjArgs(obj,
-                                                       (PyObject *)arg1, 0));
-        }
-        Object call(Object arg1, Object arg2)
-        {
-            return Object(PyObject_CallFunctionObjArgs(obj,
-                                                       (PyObject *)arg1,
-                                                       (PyObject *)arg2, 0));
-        }
-        Object call(Object arg1, Object arg2, Object arg3)
-        {
-            return Object(PyObject_CallFunctionObjArgs(obj,
-                                                       (PyObject *)arg1,
-                                                       (PyObject *)arg2,
-                                                       (PyObject *)arg3, 0));
-        }
-        Object call(Object arg1, Object arg2, Object arg3, Object arg4)
-        {
-            return Object(PyObject_CallFunctionObjArgs(obj,
-                                                       (PyObject *)arg1,
-                                                       (PyObject *)arg2,
-                                                       (PyObject *)arg3,
-                                                       (PyObject *)arg4, 0));
         }
     };
 
