@@ -132,7 +132,7 @@ namespace SimWrap
                 return get(key);
             return default_value;
         }
-        void set(const char *key, const Object &value) const
+        void set(const char *key, Object value) const
         {
             check_error(PyMapping_SetItemString(
                             obj, const_cast<char *>(key), value));
