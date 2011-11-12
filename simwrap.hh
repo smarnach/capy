@@ -60,8 +60,7 @@ namespace SimWrap
     {
         if (!PyArg_ParseTuple(args, ""))
             return 0;
-        return convert_to_py(
-            (((SimulationObject *)self)->simulation->*method)());
+        return Object((((SimulationObject *)self)->simulation->*method)());
     }
 
     template <void (Simulation::*method)()>
@@ -81,8 +80,9 @@ namespace SimWrap
         PyObject *py_arg1;
         if (!PyArg_ParseTuple(args, "O", &py_arg1))
             return 0;
-        return convert_to_py((((SimulationObject *)self)->simulation->*method)
-                             (convert_from_py<T>(py_arg1)));
+        Py_INCREF(py_arg1);
+        return Object((((SimulationObject *)self)->simulation->*method)
+                      (Object(py_arg1)));
     }
 
     template <typename T, void (Simulation::*method)(T)>
@@ -92,8 +92,8 @@ namespace SimWrap
         PyObject *py_arg1;
         if (!PyArg_ParseTuple(args, "O", &py_arg1))
             return 0;
-        (((SimulationObject *)self)->simulation->*method)(
-            convert_from_py<T>(py_arg1));
+        Py_INCREF(py_arg1);
+        (((SimulationObject *)self)->simulation->*method)(Object(py_arg1));
         Py_RETURN_NONE;
     }
 
@@ -130,7 +130,6 @@ namespace SimWrap
     simulation_new_helper(PyObject *self, PyObject *map)
     {
         Mapping config(map);
-        Py_DECREF(map);
         try {
             ((SimulationObject *)self)->simulation = new Sim(config);
         }

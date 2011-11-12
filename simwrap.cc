@@ -6,125 +6,6 @@
 
 namespace SimWrap
 {
-    // Implementation of Mapping
-    Mapping::Mapping(PyObject *map_)
-        : map(map_)
-    {
-        if (!PyMapping_Check(map))
-            throw TypeError("argument must be a mapping");
-        Py_INCREF(map);
-    }
-    Mapping::Mapping(const Mapping &other)
-        : map(other.map)
-    {
-        Py_INCREF(map);
-    }
-    Mapping::~Mapping()
-    {
-        Py_DECREF(map);
-    }
-    bool Mapping::has_key(const char *key) const
-    {
-        return PyMapping_HasKeyString(map, const_cast<char *>(key));
-    }
-    PyObject *Mapping::get_python_mapping() const
-    {
-        return map;
-    }
-
-    // Implementation of Function
-    Function::Function(PyObject *pyfunc_)
-        : pyfunc(pyfunc_)
-    {
-        if (!PyCallable_Check(pyfunc))
-            throw TypeError("argument must be callable");
-        Py_INCREF(pyfunc);
-    }
-    Function::Function(const Function &other)
-        : pyfunc(other.pyfunc)
-    {
-        Py_INCREF(pyfunc);
-    }
-    Function::~Function()
-    {
-        Py_DECREF(pyfunc);
-    }
-
-    // Convert basic Python types to the corresponding C++ type
-    template <>
-    void convert_from_py(PyObject *obj)
-    {}
-    template <>
-    bool convert_from_py(PyObject *obj)
-    {
-        bool res = PyObject_IsTrue(obj);
-        if (res == -1)
-            throw ExceptionInPythonAPI();
-        return res;
-    }
-    template <>
-    long convert_from_py(PyObject *obj)
-    {
-        long res = PyInt_AsLong(obj);
-        if (res == -1 && PyErr_Occurred())
-            throw ExceptionInPythonAPI();
-        return res;
-    }
-    template <>
-    double convert_from_py(PyObject *obj)
-    {
-        double res = PyFloat_AsDouble(obj);
-        if (res == -1 && PyErr_Occurred())
-            throw ExceptionInPythonAPI();
-        return res;
-    }
-    template <>
-    const char *convert_from_py(PyObject *obj)
-    {
-        const char *res = PyString_AsString(obj);
-        if (!res)
-            throw ExceptionInPythonAPI();
-        return res;
-    }
-    template <>
-    Mapping convert_from_py(PyObject *obj)
-    {
-        return Mapping(obj);
-    }
-    template <>
-    Function convert_from_py(PyObject *obj)
-    {
-        return Function(obj);
-    }
-
-    // Convert basic C++ types to the corresponding Python type
-    PyObject *convert_to_py(bool value)
-    {
-        // This can't fail because Py_True and Py_False are static
-        return PyBool_FromLong(value);
-    }
-    PyObject *convert_to_py(long value)
-    {
-        PyObject *obj = PyInt_FromLong(value);
-        if (!obj)
-            throw ExceptionInPythonAPI();
-        return obj;
-    }
-    PyObject *convert_to_py(double value)
-    {
-            PyObject *obj = PyFloat_FromDouble(value);
-            if (!obj)
-                throw ExceptionInPythonAPI();
-        return obj;
-    }
-    PyObject *convert_to_py(const char *value)
-    {
-        PyObject *obj = PyString_FromString(value);
-        if (!obj)
-            throw ExceptionInPythonAPI();
-        return obj;
-    }
-
     static void
     simulation_dealloc(SimulationObject *self)
     {
@@ -136,7 +17,7 @@ namespace SimWrap
     static int
     simulation_traverse(SimulationObject *self, visitproc visit, void *arg)
     {
-        Py_VISIT(self->simulation->config.get_python_mapping());
+        Py_VISIT(self->simulation->config);
         return 0;
     }
 
@@ -155,10 +36,7 @@ namespace SimWrap
     static PyObject *
     simulation_get_config(PyObject *self, void *)
     {
-        PyObject *map = ((SimulationObject *)self)->
-            simulation->config.get_python_mapping();
-        Py_INCREF(map);
-        return map;
+        return ((SimulationObject *)self)->simulation->config.new_reference();
     }
 
     static PyGetSetDef simulation_getset[] = {

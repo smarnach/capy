@@ -12,8 +12,7 @@ namespace SimWrap
     public:
         MySimulation(const Mapping& config_)
             : Simulation(config_),
-              f(config.get<Function>(
-                    "f", eval_py_expr<Function>("lambda x: x * x")))
+              f(config.get("f", eval_py_expr("lambda x: x * x")))
         {}
 
         virtual void do_time_step(double time_step)
@@ -25,7 +24,7 @@ namespace SimWrap
             for (double t = x0; t < x1 + time_step*1e-10; t += time_step)
             {
                 x.push_back(t);
-                y.push_back(f.call<double>(t));
+                y.push_back(f.call(t));
             }
         }
 
@@ -34,7 +33,7 @@ namespace SimWrap
             const char *name;
             bool verbose = config.get("verbose", false);
             if (verbose)
-                name = config.get<const char*>("name");
+                name = config.get("name");
             std::ofstream file(filename);
             for (unsigned i = 0; i < y.size(); ++i)
                 if (verbose)
