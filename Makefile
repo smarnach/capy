@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -I /usr/include/python2.7 -fPIC -Wall
+CXXFLAGS = -I /usr/include/python2.7 -fPIC -Wall -ggdb
 LDFLAGS = -shared
 LDLIBS = -lpython2.7
 
