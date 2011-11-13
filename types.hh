@@ -122,7 +122,7 @@ namespace Capy
             if (!PyMapping_Check(self))
                 throw TypeError("argument must be a mapping");
         }
-        Object get(const char *key) const
+        Object operator[](const char *key) const
         {
             return Object(PyMapping_GetItemString(self, const_cast<char *>(key)));
         }
@@ -130,7 +130,7 @@ namespace Capy
         T get(const char *key, T default_value) const
         {
             if (has_key(key))
-                return get(key);
+                return (*this)[key];
             return default_value;
         }
         void set(const char *key, Object value) const
@@ -187,7 +187,7 @@ namespace Capy
             if (!PySequence_Check(self))
                 throw TypeError("argument must be a sequence");
         }
-        Object get(ssize_t item) const
+        Object operator[](ssize_t item) const
         {
             return Object(PySequence_GetItem(self, item));
         }

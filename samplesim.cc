@@ -31,7 +31,7 @@ public:
         const char *name;
         bool verbose = config.get("verbose", false);
         if (verbose)
-            name = config.get("name");
+            name = config["name"];
         std::ofstream file(filename);
         for (unsigned i = 0; i < y.size(); ++i)
             if (verbose)
