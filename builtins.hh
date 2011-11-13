@@ -9,10 +9,26 @@ namespace Capy
         PyObject *locals = check_error(PyEval_GetLocals());
         return Object(PyRun_String(expr, Py_eval_input, globals, locals));
     }
+    inline Object eval(const char *expr, Dict globals)
+    {
+        return Object(PyRun_String(expr, Py_eval_input, globals, globals));
+    }
+    inline Object eval(const char *expr, Dict globals, Mapping locals)
+    {
+        return Object(PyRun_String(expr, Py_eval_input, globals, locals));
+    }
     inline void exec(const char *expr)
     {
         PyObject *globals = check_error(PyEval_GetGlobals());
         PyObject *locals = check_error(PyEval_GetLocals());
+        check_error(PyRun_String(expr, Py_file_input, globals, locals));
+    }
+    inline void exec(const char *expr, Dict globals)
+    {
+        check_error(PyRun_String(expr, Py_file_input, globals, globals));
+    }
+    inline void exec(const char *expr, Dict globals, Mapping locals)
+    {
         check_error(PyRun_String(expr, Py_file_input, globals, locals));
     }
     inline bool hasattr(Object obj, const char *attr)
