@@ -6,4 +6,4 @@ LDLIBS = -lpython2.7
 samplesim.so: capy.o samplesim.o
 	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-capy.o samplesim.o: capy.hh types.hh exceptions.hh
+capy.o samplesim.o: capy.hh types.hh exceptions.hh builtins.hh
