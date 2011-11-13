@@ -126,11 +126,11 @@ namespace Capy
         {
             return Object(PySequence_GetItem(self, item));
         }
-        void set(ssize_t item, Object value) const
+        void set(ssize_t item, Object value)
         {
             check_error(PySequence_SetItem(self, item, value));
         }
-        void del(ssize_t item) const
+        void del(ssize_t item)
         {
             check_error(PySequence_DelItem(self, item));
         }
@@ -162,7 +162,7 @@ namespace Capy
                 PyList_SET_ITEM(self, i, Object(v[i]).new_reference());
         }
         template <typename T>
-        void as_std_vector(std::vector<T> &v)
+        void as_std_vector(std::vector<T> &v) const
         {
             v.clear();
             v.resize(Py_SIZE(self));
@@ -221,12 +221,12 @@ namespace Capy
                 return (*this)[key];
             return default_value;
         }
-        void set(const char *key, Object value) const
+        void set(const char *key, Object value)
         {
             check_error(PyMapping_SetItemString(
                             self, const_cast<char *>(key), value));
         }
-        void del(const char *key) const
+        void del(const char *key)
         {
             check_error(PyMapping_DelItemString(self, const_cast<char *>(key)));
         }
@@ -286,7 +286,7 @@ namespace Capy
         {
             check_error(PyDict_SetItem(self, key, value));
         }
-        void del(Object key) const
+        void del(Object key)
         {
             check_error(PyDict_DelItem(self, key));
         }
