@@ -107,98 +107,6 @@ namespace Capy
         PyObject *const self;
     };
 
-    class Mapping : public Object
-    {
-    public:
-        explicit Mapping(PyObject *self_)
-            : Object(self_)
-        {
-            if (!PyMapping_Check(self))
-                throw TypeError("argument must be a mapping");
-        }
-        Mapping(const Object &other)
-            : Object(other)
-        {
-            if (!PyMapping_Check(self))
-                throw TypeError("argument must be a mapping");
-        }
-        bool contains(const char *key) const
-        {
-            return PyMapping_HasKeyString(self, const_cast<char *>(key));
-        }
-        Object operator[](const char *key) const
-        {
-            return Object(PyMapping_GetItemString(self, const_cast<char *>(key)));
-        }
-        template <typename T>
-        T get(const char *key, T default_value) const
-        {
-            if (contains(key))
-                return (*this)[key];
-            return default_value;
-        }
-        void set(const char *key, Object value) const
-        {
-            check_error(PyMapping_SetItemString(
-                            self, const_cast<char *>(key), value));
-        }
-        void del(const char *key) const
-        {
-            check_error(PyMapping_DelItemString(self, const_cast<char *>(key)));
-        }
-    };
-
-    class Dict : public Mapping
-    {
-    public:
-        explicit Dict(PyObject *self_)
-            : Mapping(self_)
-        {
-            if (!PyDict_Check(self))
-                throw TypeError("argument must be a dictionary");
-        }
-        Dict(const Object &other)
-            : Mapping(other)
-        {
-            if (!PyDict_Check(self))
-                throw TypeError("argument must be a dictionary");
-        }
-        Dict()
-            : Mapping(PyDict_New())
-        {}
-        void clear()
-        {
-            PyDict_Clear(self);
-        }
-        Dict copy() const
-        {
-            return Dict(PyDict_Copy(self));
-        }
-        bool contains(Object key) const
-        {
-            return check_error(PyDict_Contains(self, key));
-        }
-        Object operator[](Object key) const
-        {
-            return Object(PyDict_GetItem(self, key)).new_reference();
-        }
-        template <typename T>
-        T get(Object key, T default_value) const
-        {
-            if (contains(key))
-                return (*this)[key];
-            return default_value;
-        }
-        void set(Object key, Object value)
-        {
-            check_error(PyDict_SetItem(self, key, value));
-        }
-        void del(Object key) const
-        {
-            check_error(PyDict_DelItem(self, key));
-        }
-    };
-
     class Sequence : public Object
     {
     public:
@@ -280,6 +188,111 @@ namespace Capy
         void reverse()
         {
             check_error(PyList_Reverse(self));
+        }
+    };
+
+    class Mapping : public Object
+    {
+    public:
+        explicit Mapping(PyObject *self_)
+            : Object(self_)
+        {
+            if (!PyMapping_Check(self))
+                throw TypeError("argument must be a mapping");
+        }
+        Mapping(const Object &other)
+            : Object(other)
+        {
+            if (!PyMapping_Check(self))
+                throw TypeError("argument must be a mapping");
+        }
+        bool contains(const char *key) const
+        {
+            return PyMapping_HasKeyString(self, const_cast<char *>(key));
+        }
+        Object operator[](const char *key) const
+        {
+            return Object(PyMapping_GetItemString(self, const_cast<char *>(key)));
+        }
+        template <typename T>
+        T get(const char *key, T default_value) const
+        {
+            if (contains(key))
+                return (*this)[key];
+            return default_value;
+        }
+        void set(const char *key, Object value) const
+        {
+            check_error(PyMapping_SetItemString(
+                            self, const_cast<char *>(key), value));
+        }
+        void del(const char *key) const
+        {
+            check_error(PyMapping_DelItemString(self, const_cast<char *>(key)));
+        }
+        List keys() const
+        {
+            // This should actually be
+            //     return List(PyMapping_Keys(self));
+            // Since PyMapping_Keys is a macro expanding to code that
+            // generates a warning, we include the expansion of the
+            // macro and eliminate the warning.
+            return List(PyObject_CallMethod(self, (char *)"keys", 0));
+        }
+    };
+
+    class Dict : public Mapping
+    {
+    public:
+        explicit Dict(PyObject *self_)
+            : Mapping(self_)
+        {
+            if (!PyDict_Check(self))
+                throw TypeError("argument must be a dictionary");
+        }
+        Dict(const Object &other)
+            : Mapping(other)
+        {
+            if (!PyDict_Check(self))
+                throw TypeError("argument must be a dictionary");
+        }
+        Dict()
+            : Mapping(PyDict_New())
+        {}
+        void clear()
+        {
+            PyDict_Clear(self);
+        }
+        Dict copy() const
+        {
+            return Dict(PyDict_Copy(self));
+        }
+        bool contains(Object key) const
+        {
+            return check_error(PyDict_Contains(self, key));
+        }
+        Object operator[](Object key) const
+        {
+            return Object(PyDict_GetItem(self, key)).new_reference();
+        }
+        template <typename T>
+        T get(Object key, T default_value) const
+        {
+            if (contains(key))
+                return (*this)[key];
+            return default_value;
+        }
+        void set(Object key, Object value)
+        {
+            check_error(PyDict_SetItem(self, key, value));
+        }
+        void del(Object key) const
+        {
+            check_error(PyDict_DelItem(self, key));
+        }
+        List keys() const
+        {
+            return List(PyDict_Keys(self));
         }
     };
 }
