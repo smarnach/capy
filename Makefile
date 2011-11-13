@@ -3,7 +3,7 @@ CXXFLAGS = -I /usr/include/python2.7 -fPIC -Wall -ggdb
 LDFLAGS = -shared
 LDLIBS = -lpython2.7
 
-samplesim.so: simwrap.o samplesim.o
+samplesim.so: capy.o samplesim.o
 	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-simwrap.o samplesim.o: simwrap.hh types.hh exceptions.hh
+capy.o samplesim.o: capy.hh types.hh exceptions.hh

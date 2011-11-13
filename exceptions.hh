@@ -1,12 +1,12 @@
-#ifndef SIMWRAP_EXCEPTIONS_HH
-#define SIMWRAP_EXCEPTIONS_HH
+#ifndef CAPY_EXCEPTIONS_HH
+#define CAPY_EXCEPTIONS_HH
 
 // This header reproduces part of the Python exception hierarchy for
 // use by C++ code.  Throwing one of these exceptions will result in
 // the corresponding Python exception being raised in the Python
 // interpreter.
 
-namespace SimWrap
+namespace Capy
 {
     // Exception occured in Python API function.  We don't need any
     // further information as we can rely on Python's exception

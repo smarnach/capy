@@ -2,9 +2,9 @@
 #include <exception>
 #include <new>
 
-#include "simwrap.hh"
+#include "capy.hh"
 
-namespace SimWrap
+namespace Capy
 {
     static void
     simulation_dealloc(SimulationObject *self)

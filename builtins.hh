@@ -1,7 +1,7 @@
-#ifndef SIMWRAP_BUILTINS_HH
-#define SIMWRAP_BUILTINS_HH
+#ifndef CAPY_BUILTINS_HH
+#define CAPY_BUILTINS_HH
 
-namespace SimWrap
+namespace Capy
 {
     inline Object eval(const char *expr)
     {

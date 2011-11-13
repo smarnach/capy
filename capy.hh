@@ -1,5 +1,5 @@
-#ifndef SIMWRAP_HH
-#define SIMWRAP_HH
+#ifndef CAPY_HH
+#define CAPY_HH
 
 #include <Python.h>
 #include <exception>
@@ -9,7 +9,7 @@
 #include "types.hh"
 #include "builtins.hh"
 
-namespace SimWrap
+namespace Capy
 {
     class Simulation
     {

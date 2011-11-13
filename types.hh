@@ -1,11 +1,11 @@
-#ifndef SIMWRAP_TYPES_HH
-#define SIMWRAP_TYPES_HH
+#ifndef CAPY_TYPES_HH
+#define CAPY_TYPES_HH
 
 #include <vector>
 
 // This header contains wrappers around Python objects
 
-namespace SimWrap
+namespace Capy
 {
     // Wrapper around Python objects, implicitly convertible from and
     // to basic C++ types

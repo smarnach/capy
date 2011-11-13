@@ -1,16 +1,16 @@
-#include "simwrap.hh"
+#include "capy.hh"
 
 #include <vector>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
 
-class MySimulation : public SimWrap::Simulation
+class MySimulation : public Capy::Simulation
 {
 public:
-    MySimulation(const SimWrap::Mapping& config_)
+    MySimulation(const Capy::Mapping& config_)
         : Simulation(config_),
-          f(config.get("f", SimWrap::eval("lambda x: x * x")))
+          f(config.get("f", Capy::eval("lambda x: x * x")))
     {}
 
     virtual void do_time_step(double time_step)
@@ -41,7 +41,7 @@ public:
                 file << std::setw(12) << y[i] << "\n";
     }
 private:
-    SimWrap::Object f;
+    Capy::Object f;
     std::vector<double> x;
     std::vector<double> y;
 };
@@ -49,8 +49,8 @@ private:
 PyMODINIT_FUNC
 initsamplesim()
 {
-    PyObject *m = SimWrap::init_simulation_module(
-        "samplesim", "An example of a simulation wrapped with SimWrap");
-    SimWrap::add_simulation_type<MySimulation>(
+    PyObject *m = Capy::init_simulation_module(
+        "samplesim", "An example of a simulation wrapped with Capy");
+    Capy::add_simulation_type<MySimulation>(
         m, "MySimulation", "A stupid simulation examples class");
 }
