@@ -69,10 +69,6 @@ namespace Capy
             Py_INCREF(self);
             return *this;
         }
-        bool callable() const
-        {
-            return PyCallable_Check(self);
-        }
         Object operator()() const
         {
             return Object(PyObject_CallObject(self, 0));

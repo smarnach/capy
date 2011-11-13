@@ -95,6 +95,10 @@ namespace Capy
     {
         return check_error(PyDict_Size(obj));
     }
+    inline bool callable(Object obj)
+    {
+        return PyCallable_Check(obj);
+    }
 }
 
 #endif
