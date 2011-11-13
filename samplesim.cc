@@ -1,4 +1,5 @@
 #include "capy.hh"
+#include "array.hh"
 
 #include <vector>
 #include <fstream>
@@ -24,6 +25,8 @@ public:
             x.push_back(t);
             y.push_back(f(t));
         }
+        config.set("x", Capy::Array(&x[0], x.size()));
+        config.set("y", Capy::Array(&y[0], y.size()));
     }
 
     virtual void write_output(const char *filename)
@@ -53,4 +56,5 @@ initsamplesim()
         "samplesim", "An example of a simulation wrapped with Capy");
     Capy::add_simulation_type<MySimulation>(
         m, "MySimulation", "A stupid simulation examples class");
+    import_array();
 }
