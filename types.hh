@@ -122,6 +122,10 @@ namespace Capy
             if (!PyMapping_Check(self))
                 throw TypeError("argument must be a mapping");
         }
+        bool contains(const char *key) const
+        {
+            return PyMapping_HasKeyString(self, const_cast<char *>(key));
+        }
         Object operator[](const char *key) const
         {
             return Object(PyMapping_GetItemString(self, const_cast<char *>(key)));
@@ -129,7 +133,7 @@ namespace Capy
         template <typename T>
         T get(const char *key, T default_value) const
         {
-            if (has_key(key))
+            if (contains(key))
                 return (*this)[key];
             return default_value;
         }
@@ -141,10 +145,6 @@ namespace Capy
         void del(const char *key) const
         {
             check_error(PyMapping_DelItemString(self, const_cast<char *>(key)));
-        }
-        bool has_key(const char *key) const
-        {
-            return PyMapping_HasKeyString(self, const_cast<char *>(key));
         }
     };
 
