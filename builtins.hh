@@ -1,8 +1,6 @@
 #ifndef SIMWRAP_BUILTINS_HH
 #define SIMWRAP_BUILTINS_HH
 
-#include <Python.h>
-
 namespace SimWrap
 {
     inline Object eval(const char *expr)

@@ -1,9 +1,6 @@
 #ifndef SIMWRAP_EXCEPTIONS_HH
 #define SIMWRAP_EXCEPTIONS_HH
 
-#include <Python.h>
-#include <exception>
-
 // This header reproduces part of the Python exception hierarchy for
 // use by C++ code.  Throwing one of these exceptions will result in
 // the corresponding Python exception being raised in the Python

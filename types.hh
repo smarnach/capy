@@ -1,8 +1,6 @@
 #ifndef SIMWRAP_TYPES_HH
 #define SIMWRAP_TYPES_HH
 
-#include <Python.h>
-
 namespace SimWrap
 {
     // Simple wrapper around Python objects, implicitly convertible from
