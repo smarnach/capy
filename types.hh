@@ -146,6 +146,36 @@ namespace SimWrap
             return PyMapping_HasKeyString(obj, const_cast<char *>(key));
         }
     };
+
+    // Simple wrapper around Python sequence types
+    class Sequence : public Object
+    {
+    public:
+        explicit Sequence(PyObject *obj_)
+            : Object(obj_)
+        {
+            if (!PySequence_Check(obj))
+                throw TypeError("argument must be a sequence");
+        }
+        Sequence(const Object &other)
+            : Object(other)
+        {
+            if (!PySequence_Check(obj))
+                throw TypeError("argument must be a sequence");
+        }
+        Object get(ssize_t item) const
+        {
+            return Object(PySequence_GetItem(obj, item));
+        }
+        void set(ssize_t item, Object value) const
+        {
+            check_error(PySequence_SetItem(obj, item, value));
+        }
+        void del(ssize_t item) const
+        {
+            check_error(PySequence_DelItem(obj, item));
+        }
+    };
 }
 
 #endif

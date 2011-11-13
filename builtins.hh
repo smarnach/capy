@@ -69,6 +69,10 @@ namespace SimWrap
     {
         return check_error(PyMapping_Length(obj));
     }
+    inline ssize_t len(Sequence obj)
+    {
+        return check_error(PySequence_Length(obj));
+    }
 }
 
 #endif
