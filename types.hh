@@ -148,6 +148,30 @@ namespace Capy
         }
     };
 
+    class Dict : public Mapping
+    {
+    public:
+        explicit Dict(PyObject *self_)
+            : Mapping(self_)
+        {
+            if (!PyDict_Check(self))
+                throw TypeError("argument must be a dictionary");
+        }
+        Dict(const Object &other)
+            : Mapping(other)
+        {
+            if (!PyDict_Check(self))
+                throw TypeError("argument must be a dictionary");
+        }
+        Dict()
+            : Mapping(PyDict_New())
+        {}
+        void clear()
+        {
+            PyDict_Clear(self);
+        }
+    };
+
     class Sequence : public Object
     {
     public:

@@ -75,6 +75,10 @@ namespace Capy
     {
         return check_error(PyList_Size(obj));
     }
+    inline ssize_t len(Dict obj)
+    {
+        return check_error(PyDict_Size(obj));
+    }
 }
 
 #endif
