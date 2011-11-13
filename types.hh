@@ -170,6 +170,33 @@ namespace Capy
         {
             PyDict_Clear(self);
         }
+        Dict copy() const
+        {
+            return Dict(PyDict_Copy(self));
+        }
+        bool contains(Object key) const
+        {
+            return check_error(PyDict_Contains(self, key));
+        }
+        Object operator[](Object key) const
+        {
+            return Object(PyDict_GetItem(self, key)).new_reference();
+        }
+        template <typename T>
+        T get(Object key, T default_value) const
+        {
+            if (contains(key))
+                return (*this)[key];
+            return default_value;
+        }
+        void set(Object key, Object value)
+        {
+            check_error(PyDict_SetItem(self, key, value));
+        }
+        void del(Object key) const
+        {
+            check_error(PyDict_DelItem(self, key));
+        }
     };
 
     class Sequence : public Object
