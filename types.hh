@@ -64,10 +64,10 @@ namespace Capy
         {
             return self;
         }
-        PyObject *new_reference() const
+        Object &new_reference()
         {
             Py_INCREF(self);
-            return self;
+            return *this;
         }
         bool callable() const
         {

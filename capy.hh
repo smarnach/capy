@@ -81,8 +81,8 @@ namespace Capy
         PyObject *py_arg1;
         if (!PyArg_ParseTuple(args, "O", &py_arg1))
             return 0;
-        Py_INCREF(py_arg1);
-        return Object((self->simulation->*method)(Object(py_arg1)));
+        return Object((self->simulation->*method)
+                      (Object(py_arg1).new_reference()));
     }
 
     template <typename T, void (Simulation::*method)(T)>
@@ -92,8 +92,7 @@ namespace Capy
         PyObject *py_arg1;
         if (!PyArg_ParseTuple(args, "O", &py_arg1))
             return 0;
-        Py_INCREF(py_arg1);
-        (self->simulation->*method)(Object(py_arg1));
+        (self->simulation->*method)(Object(py_arg1).new_reference());
         Py_RETURN_NONE;
     }
 
