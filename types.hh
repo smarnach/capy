@@ -174,6 +174,61 @@ namespace SimWrap
             check_error(PySequence_DelItem(obj, item));
         }
     };
+
+    class List : public Sequence
+    {
+    public:
+        explicit List(PyObject *obj_)
+            : Sequence(obj_)
+        {
+            if (!PyList_Check(obj))
+                throw TypeError("argument must be a list");
+        }
+        List(const Object &other)
+            : Sequence(other)
+        {
+            if (!PyList_Check(obj))
+                throw TypeError("argument must be a list");
+        }
+        List()
+            : Sequence(PyList_New(0))
+        {}
+        template <typename T>
+        List(const std::vector<T> &v)
+            : Sequence(PyList_New(v.size()))
+        {
+            for (size_t i = 0; i < v.size(); ++i)
+                PyList_SET_ITEM(obj, i, Object(v[i]).new_reference());
+        }
+        template <typename T>
+        void as_std_vector(std::vector<T> &v)
+        {
+            v.clear();
+            v.resize(Py_SIZE(obj));
+            for (size_t i = 0; i < v.size(); ++i)
+            {
+                Object item(PyList_GET_ITEM(obj, i));
+                item.new_reference();
+                v[i] = item;
+            }
+        }
+        void insert(ssize_t index, Object value)
+        {
+            check_error(PyList_Insert(obj, index, value));
+        }
+        void append(Object value)
+        {
+            check_error(PyList_Append(obj, value));
+        }
+        void sort()
+        {
+            check_error(PyList_Sort(obj));
+        }
+        void reverse()
+        {
+            check_error(PyList_Reverse(obj));
+        }
+    };
 }
 
 #endif

@@ -61,15 +61,19 @@ namespace SimWrap
     }
     inline ssize_t len(Object obj)
     {
-        return check_error(PyObject_Length(obj));
+        return check_error(PyObject_Size(obj));
     }
     inline ssize_t len(Mapping obj)
     {
-        return check_error(PyMapping_Length(obj));
+        return check_error(PyMapping_Size(obj));
     }
     inline ssize_t len(Sequence obj)
     {
-        return check_error(PySequence_Length(obj));
+        return check_error(PySequence_Size(obj));
+    }
+    inline ssize_t len(List obj)
+    {
+        return check_error(PyList_Size(obj));
     }
 }
 
