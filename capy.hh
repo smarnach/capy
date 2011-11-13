@@ -2,6 +2,7 @@
 #define CAPY_HH
 
 #include <Python.h>
+#include <unistd.h>
 #include <exception>
 #include <new>
 
