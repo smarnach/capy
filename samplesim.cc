@@ -11,13 +11,13 @@ class MySimulation
 public:
     MySimulation(const Capy::Mapping& config_)
         : config(config_),
-          f(config.get("f", Capy::eval("lambda x: x * x")))
+          f(config.setdefault("f", Capy::eval("lambda x: x * x")))
     {}
 
     void do_time_step(double time_step)
     {
-        double x0 = config.get("x0", 0.0);
-        double x1 = config.get("x1", 1.0);
+        double x0 = config.setdefault("x0", 0.0);
+        double x1 = config.setdefault("x1", 1.0);
         x.clear();
         y.clear();
         for (double t = x0; t < x1 + time_step*1e-10; t += time_step)
@@ -32,7 +32,7 @@ public:
     void write_output(const char *filename)
     {
         const char *name;
-        bool verbose = config.get("verbose", false);
+        bool verbose = config.setdefault("verbose", false);
         if (verbose)
             name = config["name"];
         std::ofstream file(filename);

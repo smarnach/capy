@@ -222,6 +222,14 @@ namespace Capy
             check_error(PyMapping_SetItemString(
                             self, const_cast<char *>(key), value));
         }
+        template <typename T>
+        T setdefault(const char *key, T default_value)
+        {
+            if (contains(key))
+                return (*this)[key];
+            set(key, default_value);
+            return default_value;
+        }
         void del(const char *key)
         {
             check_error(PyMapping_DelItemString(self, const_cast<char *>(key)));
@@ -281,6 +289,14 @@ namespace Capy
         void set(Object key, Object value)
         {
             check_error(PyDict_SetItem(self, key, value));
+        }
+        template <typename T>
+        T setdefault(Object key, T default_value)
+        {
+            if (contains(key))
+                return (*this)[key];
+            set(key, default_value);
+            return default_value;
         }
         void del(Object key)
         {
