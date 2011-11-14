@@ -6,15 +6,15 @@
 #include <iostream>
 #include <iomanip>
 
-class MySimulation : public Capy::Simulation
+class MySimulation
 {
 public:
     MySimulation(const Capy::Mapping& config_)
-        : Simulation(config_),
+        : config(config_),
           f(config.get("f", Capy::eval("lambda x: x * x")))
     {}
 
-    virtual void do_time_step(double time_step)
+    void do_time_step(double time_step)
     {
         double x0 = config.get("x0", 0.0);
         double x1 = config.get("x1", 1.0);
@@ -29,7 +29,7 @@ public:
         config.set("y", Capy::Array(&y[0], y.size()));
     }
 
-    virtual void write_output(const char *filename)
+    void write_output(const char *filename)
     {
         const char *name;
         bool verbose = config.get("verbose", false);
@@ -43,7 +43,9 @@ public:
             else
                 file << std::setw(12) << y[i] << "\n";
     }
+
 private:
+    Capy::Mapping config;
     Capy::Object f;
     std::vector<double> x;
     std::vector<double> y;
@@ -52,9 +54,14 @@ private:
 PyMODINIT_FUNC
 initsamplesim()
 {
-    PyObject *m = Capy::init_simulation_module(
-        "samplesim", "An example of a simulation wrapped with Capy");
-    Capy::add_simulation_type<MySimulation>(
-        m, "MySimulation", "A stupid simulation examples class");
+    PyObject *module = Py_InitModule3(
+        "samplesim", 0, "An example of a simulation wrapped with Capy");
+    static Capy::Class<MySimulation> mysim(
+        "MySimulation", "A stupid simulation examples class");
+    mysim.add_method<double, &MySimulation::do_time_step>(
+        "do_time_step", "Run a single time step of the simulation.");
+    mysim.add_method<const char *, &MySimulation::write_output>(
+        "write_output", "Write output to the given file name.");
+    mysim.add_to(module);
     import_array();
 }
