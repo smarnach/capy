@@ -34,6 +34,11 @@ namespace Capy
         {
             check_error(self);
         }
+        Object(int value)
+            : self(PyInt_FromLong(value))
+        {
+            check_error(self);
+        }
         Object(double value)
             : self(PyFloat_FromDouble(value))
         {
@@ -49,6 +54,10 @@ namespace Capy
             return check_error(PyObject_IsTrue(self));
         }
         operator long() const
+        {
+            return check_error(PyInt_AsLong(self));
+        }
+        operator int() const
         {
             return check_error(PyInt_AsLong(self));
         }
