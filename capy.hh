@@ -132,7 +132,7 @@ namespace Capy
         {
             if (!PyArg_ParseTuple(args, ""))
                 return 0;
-            return Object((self->instance->*method)());
+            return Object((self->instance->*method)()).new_reference();
         }
         template <void (Cls::*method)()>
         static PyObject *
@@ -151,7 +151,7 @@ namespace Capy
             if (!PyArg_ParseTuple(args, "O", &py_arg1))
                 return 0;
             return Object((self->instance->*method)
-                          (Object(py_arg1).new_reference()));
+                          (Object(py_arg1).new_reference())).new_reference();
         }
         template <typename T, void (Cls::*method)(T)>
         static PyObject *
