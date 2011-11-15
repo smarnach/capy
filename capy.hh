@@ -73,6 +73,16 @@ namespace Capy
         {
             add_method_def(name, check_call<Class::call_method<T, method> >, doc);
         }
+        template <typename RT, typename T1, typename T2, RT (Cls::*method)(T1, T2)>
+        void add_method(const char *name, const char *doc = 0)
+        {
+            add_method_def(name, check_call<Class::call_method<RT, T1, T2, method> >, doc);
+        }
+        template <typename T1, typename T2, void (Cls::*method)(T1, T2)>
+        void add_method(const char *name, const char *doc = 0)
+        {
+            add_method_def(name, check_call<Class::call_method<T1, T2, method> >, doc);
+        }
 
         int add_to(PyObject *module)
         {
@@ -161,6 +171,30 @@ namespace Capy
             if (!PyArg_ParseTuple(args, "O", &py_arg1))
                 return 0;
             (self->instance->*method)(Object(py_arg1).new_reference());
+            Py_RETURN_NONE;
+        }
+        template <typename RT, typename T1, typename T2, RT (Cls::*method)(T1, T2)>
+        static PyObject *
+        call_method(ClsObject *self, PyObject *args)
+        {
+            PyObject *py_arg1;
+            PyObject *py_arg2;
+            if (!PyArg_ParseTuple(args, "OO", &py_arg1, &py_arg2))
+                return 0;
+            return Object((self->instance->*method)
+                          (Object(py_arg1).new_reference(),
+                           Object(py_arg2).new_reference())).new_reference();
+        }
+        template <typename T1, typename T2, void (Cls::*method)(T1, T2)>
+        static PyObject *
+        call_method(ClsObject *self, PyObject *args)
+        {
+            PyObject *py_arg1;
+            PyObject *py_arg2;
+            if (!PyArg_ParseTuple(args, "OO", &py_arg1, &py_arg2))
+                return 0;
+            (self->instance->*method)(Object(py_arg1).new_reference(),
+                                      Object(py_arg2).new_reference());
             Py_RETURN_NONE;
         }
 
