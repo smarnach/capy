@@ -63,7 +63,7 @@ initsamplesim()
         "do_time_step", "Run a single time step of the simulation.");
     mysim.add_method<const char *, &MySimulation::write_output>(
         "write_output", "Write output to the given file name.");
-    mysim.add_member("config", &MySimulation::config);
+    mysim.add_py_member("config", &MySimulation::config);
     mysim.add_to(module);
     import_array();
 }

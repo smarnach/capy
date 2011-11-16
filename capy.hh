@@ -89,6 +89,16 @@ namespace Capy
                  0, const_cast<char *>(doc), &members.back()};
             getset.insert(getset.end() - 1, gs);
         }
+        template <typename T>
+        void add_py_member(const char *name, T Cls::*memb, const char *doc = 0)
+        {
+            py_members.push_back((Object Cls::*)memb);
+            PyGetSetDef gs =
+                {const_cast<char *>(name),
+                 (getter)(PyObject *(*)(ClsObject *, T Cls::**))get_member<T>,
+                 0, const_cast<char *>(doc), &py_members.back()};
+            getset.insert(getset.end() - 1, gs);
+        }
 
         int add_to(PyObject *module)
         {
@@ -107,6 +117,17 @@ namespace Capy
             type.tp_getset = &getset[0];
             if (PyType_Ready(&type) == -1)
                 return -1;
+            PyObject *py_members_cobj = PyCObject_FromVoidPtr(&py_members, 0);
+            if (!py_members_cobj)
+                return -1;
+            if (PyDict_SetItemString(type.tp_dict, "_capy_py_members",
+                                     py_members_cobj) == -1)
+            {
+                printf("Huh!\n");
+                Py_DECREF(py_members_cobj);
+                return -1;
+            }
+            Py_DECREF(py_members_cobj);
             return PyModule_AddObject(module, type_name, (PyObject *)(&type));
         }
 
@@ -266,7 +287,20 @@ namespace Capy
         static int
         traverse(ClsObject *self, visitproc visit, void *arg)
         {
-            // XXX
+            PyObject *py_members_cobj = PyObject_GetAttrString(
+                (PyObject *)Py_TYPE(self), "_capy_py_members");
+            if (!py_members_cobj)
+            {
+                PyErr_Clear();
+                return 0;
+            }
+            typedef std::vector<Object Cls::*> PyMembers;
+            PyMembers py_members =
+                *(PyMembers *)PyCObject_AsVoidPtr(py_members_cobj);
+            for (unsigned i = 0; i < py_members.size(); ++i) { 
+                PyObject *ob = self->instance->*py_members[i];
+                Py_VISIT(ob);
+            }
             return 0;
         }
 
@@ -274,7 +308,7 @@ namespace Capy
         char qname[256];
         std::vector<PyMethodDef> methods;
         std::vector<int Cls::*> members;
-        std::vector<Object Cls::*> traverse_list;
+        std::vector<Object Cls::*> py_members;
         std::vector<PyGetSetDef> getset;
     };
 }
