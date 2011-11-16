@@ -11,10 +11,16 @@ namespace Capy
     }
     inline Object eval(const char *expr, Dict globals)
     {
+        if (!globals.contains("__builtins__"))
+            globals.set("__builtins__",
+                        Object(PyEval_GetBuiltins()).new_reference());
         return Object(PyRun_String(expr, Py_eval_input, globals, globals));
     }
     inline Object eval(const char *expr, Dict globals, Mapping locals)
     {
+        if (!globals.contains("__builtins__"))
+            globals.set("__builtins__",
+                        Object(PyEval_GetBuiltins()).new_reference());
         return Object(PyRun_String(expr, Py_eval_input, globals, locals));
     }
     inline void exec(const char *expr)
@@ -25,10 +31,16 @@ namespace Capy
     }
     inline void exec(const char *expr, Dict globals)
     {
+        if (!globals.contains("__builtins__"))
+            globals.set("__builtins__",
+                        Object(PyEval_GetBuiltins()).new_reference());
         check_error(PyRun_String(expr, Py_file_input, globals, globals));
     }
     inline void exec(const char *expr, Dict globals, Mapping locals)
     {
+        if (!globals.contains("__builtins__"))
+            globals.set("__builtins__",
+                        Object(PyEval_GetBuiltins()).new_reference());
         check_error(PyRun_String(expr, Py_file_input, globals, locals));
     }
     inline bool hasattr(Object obj, const char *attr)
