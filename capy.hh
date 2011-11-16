@@ -21,7 +21,6 @@ namespace Capy
         {
             PyObject_HEAD
             Cls *instance;
-            PyObject *config;
         };
 
         Class(const char *type_name, const char *doc = 0)
@@ -39,17 +38,13 @@ namespace Capy
             type.tp_new = new_;
             PyMethodDef meth = {0};
             methods.push_back(meth);
-            PyMemberDef memb = {(char *)"config", T_OBJECT,
-                                offsetof(ClsObject, config), READONLY, 0};
-            members.push_back(memb);
-            memb.name = 0;
-            members.push_back(memb);
             PyGetSetDef gs = {0};
             getset.push_back(gs);
         }
 
         ~Class()
         {
+            // XXX
             fprintf(stderr, "Warning: Class instance should be 'static'.\n");
         }
 
@@ -84,6 +79,17 @@ namespace Capy
             add_method_def(name, check_call<Class::call_method<T1, T2, method> >, doc);
         }
 
+        template <typename T>
+        void add_member(const char *name, T Cls::*memb, const char *doc = 0)
+        {
+            members.push_back((int Cls::*)memb);
+            PyGetSetDef gs =
+                {const_cast<char *>(name),
+                 (getter)(PyObject *(*)(ClsObject *, T Cls::**))get_member<T>,
+                 0, const_cast<char *>(doc), &members.back()};
+            getset.insert(getset.end() - 1, gs);
+        }
+
         int add_to(PyObject *module)
         {
             if (!module)
@@ -98,7 +104,6 @@ namespace Capy
             else
                 PyErr_Clear();
             type.tp_methods = &methods[0];
-            type.tp_members = &members[0];
             type.tp_getset = &getset[0];
             if (PyType_Ready(&type) == -1)
                 return -1;
@@ -204,7 +209,6 @@ namespace Capy
             Mapping config(map);
             try {
                 self->instance = new Cls(config);
-                self->config = map;
             }
             catch (...) {
                 Py_DECREF(self);
@@ -240,6 +244,17 @@ namespace Capy
             return check_call<Class::new_helper>(instance, map);
         }
 
+        template <typename T>
+        static PyObject *get_member(ClsObject *self, T Cls::**memb)
+        {
+            try {
+                return Object(self->instance->**memb).new_reference();
+            }
+            catch (ExceptionInPythonAPI&) {
+                return 0;
+            }
+        }
+
         static void
         dealloc(ClsObject *self)
         {
@@ -251,14 +266,15 @@ namespace Capy
         static int
         traverse(ClsObject *self, visitproc visit, void *arg)
         {
-            Py_VISIT(self->config);
+            // XXX
             return 0;
         }
 
         PyTypeObject type;
         char qname[256];
         std::vector<PyMethodDef> methods;
-        std::vector<PyMemberDef> members;
+        std::vector<int Cls::*> members;
+        std::vector<Object Cls::*> traverse_list;
         std::vector<PyGetSetDef> getset;
     };
 }
