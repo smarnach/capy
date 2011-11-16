@@ -42,12 +42,6 @@ namespace Capy
             getset.push_back(gs);
         }
 
-        ~Class()
-        {
-            // XXX
-            fprintf(stderr, "Warning: Class instance should be 'static'.\n");
-        }
-
         template <typename RT, RT (Cls::*method)()>
         void add_method(const char *name, const char *doc = 0)
         {
