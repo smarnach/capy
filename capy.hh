@@ -100,8 +100,7 @@ namespace Capy
                 return -1;
             const char *type_name = type.tp_name;
             const char *mod_name = PyModule_GetName(module);
-            if (mod_name)
-            {
+            if (mod_name) {
                 sprintf(qname, "%s.%s", mod_name, type_name);
                 type.tp_name = qname;
             }
@@ -115,8 +114,7 @@ namespace Capy
             if (!py_members_cobj)
                 return -1;
             if (PyDict_SetItemString(type.tp_dict, "_capy_py_members",
-                                     py_members_cobj) == -1)
-            {
+                                     py_members_cobj) == -1) {
                 printf("Huh!\n");
                 Py_DECREF(py_members_cobj);
                 return -1;
@@ -283,15 +281,14 @@ namespace Capy
         {
             PyObject *py_members_cobj = PyObject_GetAttrString(
                 (PyObject *)Py_TYPE(self), "_capy_py_members");
-            if (!py_members_cobj)
-            {
+            if (!py_members_cobj) {
                 PyErr_Clear();
                 return 0;
             }
             typedef std::vector<Object Cls::*> PyMembers;
             PyMembers py_members =
                 *(PyMembers *)PyCObject_AsVoidPtr(py_members_cobj);
-            for (unsigned i = 0; i < py_members.size(); ++i) { 
+            for (unsigned i = 0; i < py_members.size(); ++i) {
                 PyObject *ob = self->instance->*py_members[i];
                 Py_VISIT(ob);
             }

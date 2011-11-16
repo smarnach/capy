@@ -171,8 +171,7 @@ namespace Capy
         {
             v.clear();
             v.resize(Py_SIZE(self));
-            for (size_t i = 0; i < v.size(); ++i)
-            {
+            for (size_t i = 0; i < v.size(); ++i) {
                 Object item(PyList_GET_ITEM(self, i));
                 item.new_reference();
                 v[i] = item;
