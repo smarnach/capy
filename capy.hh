@@ -9,7 +9,7 @@
 
 #include "exceptions.hh"
 #include "types.hh"
-#include "builtins.hh"
+#include "api.hh"
 
 namespace Capy
 {
