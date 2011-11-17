@@ -106,9 +106,12 @@ namespace Capy
             getset->insert(getset->end() - 1, gs);
         }
         template <typename T>
-        void add_py_member(const char *name, T Cls::*memb, const char *doc = 0)
+        void add_py_member(const char *name, T Cls::*memb,
+                           const char *doc = 0, bool visible = true)
         {
             py_members->push_back((Object Cls::*)memb);
+            if (!visible)
+                return;
             PyGetSetDef gs =
                 {const_cast<char *>(name),
                  (getter)(PyObject *(*)(ClsObject *, T Cls::**))get_member<T>,
