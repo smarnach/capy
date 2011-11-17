@@ -314,6 +314,11 @@ namespace Capy
         {
             return List(PyDict_Keys(self));
         }
+        void update(Mapping other)
+        {
+            PyObject_CallMethod(self, (char *)"update",(char *) "O",
+                                (PyObject *)other);
+        }
     };
 }
 
