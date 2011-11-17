@@ -58,7 +58,7 @@ initsamplesim()
     Capy::Extension extension(
         "samplesim", "An example of a simulation wrapped with Capy");
     Capy::Class<MySimulation> mysim(
-        "MySimulation", extension, "A stupid simulation examples class");
+        extension, "MySimulation", "A stupid simulation examples class");
     mysim.add_method<double, &MySimulation::do_time_step>(
         "do_time_step", "Run a single time step of the simulation.");
     mysim.add_method<const char *, &MySimulation::write_output>(

@@ -7,6 +7,7 @@ namespace Capy
     class Class
     {
     public:
+        Extension &extension;
         const char *const type_name;
 
         struct ClsObject
@@ -15,9 +16,9 @@ namespace Capy
             Cls *instance;
         };
 
-        Class(const char *type_name_, Extension &ext, const char *doc = 0)
-            : type_name(type_name_),
-              extension(ext),
+        Class(Extension &ext, const char *type_name_, const char *doc = 0)
+            : extension(ext),
+              type_name(type_name_),
               type(new PyTypeObject),
               methods(new std::vector<PyMethodDef>),
               members(new std::vector<int Cls::*>),
@@ -274,7 +275,6 @@ namespace Capy
             return 0;
         }
 
-        Extension &extension;
         PyTypeObject *type;
         std::vector<PyMethodDef> *methods;
         std::vector<int Cls::*> *members;
