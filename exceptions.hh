@@ -1,6 +1,9 @@
 #ifndef CAPY_EXCEPTIONS_HH
 #define CAPY_EXCEPTIONS_HH
 
+#include <exception>
+#include <new>
+
 // This header reproduces part of the Python exception hierarchy for
 // use by C++ code.  Throwing one of these exceptions will result in
 // the corresponding Python exception being raised in the Python
