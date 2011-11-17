@@ -43,6 +43,41 @@ namespace Capy
                         Object(PyEval_GetBuiltins()).new_reference());
         check_error(PyRun_String(expr, Py_file_input, globals, locals));
     }
+    inline void console()
+    {
+        exec("import rlcompleter, readline\n"
+             "readline.parse_and_bind('tab: complete')", Dict());
+        printf("Entering Capy debugging console\n");
+        check_error(PyRun_InteractiveLoop(stdin, "<stdin>"));
+        printf("Leaving Capy debugging console\n");
+    }
+    inline void console(Mapping vars, const char *mod_name = "__main__")
+    {
+        if (mod_name)
+        {
+            Object module(PyImport_AddModule(mod_name));
+            module.new_reference();
+            Dict mod_dict(PyModule_GetDict(module));
+            mod_dict.new_reference();
+            mod_dict.update(vars);
+            console();
+        }
+        else {
+            Dict modules(PyImport_GetModuleDict());
+            modules.new_reference();
+            Object old_main = modules.get("__main__");
+            Object new_main(PyModule_New("__main__"));
+            modules.set("__main__", new_main);
+            Dict mod_dict(PyModule_GetDict(new_main));
+            mod_dict.new_reference();
+            mod_dict.set("_capy_main", old_main);
+            mod_dict.set("__builtins__",
+                         Object(PyEval_GetBuiltins()).new_reference());
+            mod_dict.update(vars);
+            console();
+            modules.set("__main__", old_main);
+        }
+    }
     inline bool hasattr(Object obj, const char *attr)
     {
         return PyObject_HasAttrString(obj, attr);
