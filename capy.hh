@@ -3,6 +3,7 @@
 
 #include <Python.h>
 #include <unistd.h>
+#include <vector>
 
 #include "exceptions.hh"
 #include "types.hh"

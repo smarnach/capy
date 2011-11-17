@@ -1,8 +1,6 @@
 #ifndef CAPY_TYPES_HH
 #define CAPY_TYPES_HH
 
-#include <vector>
-
 // This header contains wrappers around Python objects
 
 namespace Capy

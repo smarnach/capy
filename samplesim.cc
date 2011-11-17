@@ -1,7 +1,6 @@
 #include "capy.hh"
 #include "array.hh"
 
-#include <vector>
 #include <fstream>
 #include <iostream>
 #include <iomanip>

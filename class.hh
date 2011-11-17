@@ -1,8 +1,6 @@
 #ifndef CAPY_CLASS_HH
 #define CAPY_CLASS_HH
 
-#include <vector>
-
 namespace Capy
 {
     template <typename Cls>
