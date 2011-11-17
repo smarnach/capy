@@ -127,7 +127,7 @@ namespace Capy
             if (!PySequence_Check(self))
                 throw TypeError("argument must be a sequence");
         }
-        Object operator[](ssize_t item) const
+        Object get(ssize_t item) const
         {
             return Object(PySequence_GetItem(self, item));
         }
@@ -214,7 +214,7 @@ namespace Capy
         {
             return PyMapping_HasKeyString(self, const_cast<char *>(key));
         }
-        Object operator[](const char *key) const
+        Object get(const char *key) const
         {
             return Object(PyMapping_GetItemString(self, const_cast<char *>(key)));
         }
@@ -222,7 +222,7 @@ namespace Capy
         T get(const char *key, T default_value) const
         {
             if (contains(key))
-                return (*this)[key];
+                return get(key);
             return default_value;
         }
         void set(const char *key, Object value)
@@ -234,7 +234,7 @@ namespace Capy
         T setdefault(const char *key, T default_value)
         {
             if (contains(key))
-                return (*this)[key];
+                return get(key);
             set(key, default_value);
             return default_value;
         }
@@ -283,7 +283,7 @@ namespace Capy
         {
             return check_error(PyDict_Contains(self, key));
         }
-        Object operator[](Object key) const
+        Object get(Object key) const
         {
             return Object(PyDict_GetItem(self, key)).new_reference();
         }
@@ -291,7 +291,7 @@ namespace Capy
         T get(Object key, T default_value) const
         {
             if (contains(key))
-                return (*this)[key];
+                return get(key);
             return default_value;
         }
         void set(Object key, Object value)
@@ -302,7 +302,7 @@ namespace Capy
         T setdefault(Object key, T default_value)
         {
             if (contains(key))
-                return (*this)[key];
+                return get(key);
             set(key, default_value);
             return default_value;
         }
