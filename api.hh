@@ -53,30 +53,12 @@ namespace Capy
     }
     inline void console(Mapping vars, const char *mod_name = "__main__")
     {
-        if (mod_name)
-        {
-            Object module(PyImport_AddModule(mod_name));
-            module.new_reference();
-            Dict mod_dict(PyModule_GetDict(module));
-            mod_dict.new_reference();
-            mod_dict.update(vars);
-            console();
-        }
-        else {
-            Dict modules(PyImport_GetModuleDict());
-            modules.new_reference();
-            Object old_main = modules.get("__main__");
-            Object new_main(PyModule_New("__main__"));
-            modules.set("__main__", new_main);
-            Dict mod_dict(PyModule_GetDict(new_main));
-            mod_dict.new_reference();
-            mod_dict.set("_capy_main", old_main);
-            mod_dict.set("__builtins__",
-                         Object(PyEval_GetBuiltins()).new_reference());
-            mod_dict.update(vars);
-            console();
-            modules.set("__main__", old_main);
-        }
+        Object module(PyImport_AddModule(mod_name));
+        module.new_reference();
+        Dict mod_dict(PyModule_GetDict(module));
+        mod_dict.new_reference();
+        mod_dict.update(vars);
+        console();
     }
     inline bool hasattr(Object obj, const char *attr)
     {
