@@ -8,6 +8,7 @@
 #include "exceptions.hh"
 #include "types.hh"
 #include "api.hh"
+#include "extension.hh"
 #include "class.hh"
 
 #endif

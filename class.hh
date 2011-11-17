@@ -7,14 +7,18 @@ namespace Capy
     class Class
     {
     public:
+        const char *const type_name;
+
         struct ClsObject
         {
             PyObject_HEAD
             Cls *instance;
         };
 
-        Class(const char *type_name, const char *doc = 0)
-            : type(new PyTypeObject),
+        Class(const char *type_name_, Extension &ext, const char *doc = 0)
+            : type_name(type_name_),
+              extension(ext),
+              type(new PyTypeObject),
               methods(new std::vector<PyMethodDef>),
               members(new std::vector<int Cls::*>),
               py_members(new std::vector<Object Cls::*>),
@@ -22,7 +26,10 @@ namespace Capy
         {
             memset(type, 0, sizeof(*type));
             Py_INCREF(type);
-            type->tp_name = type_name;
+            char *qname =
+                new char[strlen(extension.mod_name) + strlen(type_name) + 2];
+            sprintf(qname, "%s.%s", extension.mod_name, type_name);
+            type->tp_name = qname;
             type->tp_basicsize = sizeof(ClsObject);
             type->tp_dealloc = (destructor)dealloc;
             type->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE |
@@ -35,6 +42,26 @@ namespace Capy
             methods->push_back(meth);
             PyGetSetDef gs = {0};
             getset->push_back(gs);
+        }
+
+        ~Class()
+        {
+            if (PyErr_Occurred())
+                return;
+            type->tp_methods = &methods->front();
+            type->tp_getset = &getset->front();
+            if (PyType_Ready(type) == -1)
+                return;
+            PyObject *py_members_cobj = PyCObject_FromVoidPtr(py_members, 0);
+            if (!py_members_cobj)
+                return;
+            if (PyDict_SetItemString(type->tp_dict, "_capy_py_members",
+                                     py_members_cobj) == -1) {
+                Py_DECREF(py_members_cobj);
+                return;
+            }
+            Py_DECREF(py_members_cobj);
+            extension.add_object(type_name, Object((PyObject *)type));
         }
 
         template <typename RT, RT (Cls::*method)()>
@@ -87,35 +114,6 @@ namespace Capy
                  (getter)(PyObject *(*)(ClsObject *, T Cls::**))get_member<T>,
                  0, const_cast<char *>(doc), &py_members->back()};
             getset->insert(getset->end() - 1, gs);
-        }
-
-        int add_to(PyObject *module)
-        {
-            if (!module)
-                return -1;
-            const char *type_name = type->tp_name;
-            const char *mod_name = PyModule_GetName(module);
-            if (mod_name) {
-                char *qname = new char[strlen(mod_name) + strlen(type_name) + 2];
-                sprintf(qname, "%s.%s", mod_name, type_name);
-                type->tp_name = qname;
-            }
-            else
-                PyErr_Clear();
-            type->tp_methods = &methods->front();
-            type->tp_getset = &getset->front();
-            if (PyType_Ready(type) == -1)
-                return -1;
-            PyObject *py_members_cobj = PyCObject_FromVoidPtr(py_members, 0);
-            if (!py_members_cobj)
-                return -1;
-            if (PyDict_SetItemString(type->tp_dict, "_capy_py_members",
-                                     py_members_cobj) == -1) {
-                Py_DECREF(py_members_cobj);
-                return -1;
-            }
-            Py_DECREF(py_members_cobj);
-            return PyModule_AddObject(module, type_name, (PyObject *)(type));
         }
 
     private:
@@ -273,6 +271,7 @@ namespace Capy
             return 0;
         }
 
+        Extension &extension;
         PyTypeObject *type;
         std::vector<PyMethodDef> *methods;
         std::vector<int Cls::*> *members;
