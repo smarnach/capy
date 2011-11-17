@@ -111,7 +111,6 @@ namespace Capy
                 return -1;
             if (PyDict_SetItemString(type->tp_dict, "_capy_py_members",
                                      py_members_cobj) == -1) {
-                printf("Huh!\n");
                 Py_DECREF(py_members_cobj);
                 return -1;
             }
