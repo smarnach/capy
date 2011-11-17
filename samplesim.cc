@@ -56,7 +56,7 @@ initsamplesim()
 {
     PyObject *module = Py_InitModule3(
         "samplesim", 0, "An example of a simulation wrapped with Capy");
-    static Capy::Class<MySimulation> mysim(
+    Capy::Class<MySimulation> mysim(
         "MySimulation", "A stupid simulation examples class");
     mysim.add_method<double, &MySimulation::do_time_step>(
         "do_time_step", "Run a single time step of the simulation.");

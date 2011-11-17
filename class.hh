@@ -14,22 +14,27 @@ namespace Capy
         };
 
         Class(const char *type_name, const char *doc = 0)
+            : type(new PyTypeObject),
+              methods(new std::vector<PyMethodDef>),
+              members(new std::vector<int Cls::*>),
+              py_members(new std::vector<Object Cls::*>),
+              getset(new std::vector<PyGetSetDef>)
         {
-            memset(&type, 0, sizeof(type));
-            Py_INCREF(&type);
-            type.tp_name = type_name;
-            type.tp_basicsize = sizeof(ClsObject);
-            type.tp_dealloc = (destructor)dealloc;
-            type.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE |
+            memset(type, 0, sizeof(*type));
+            Py_INCREF(type);
+            type->tp_name = type_name;
+            type->tp_basicsize = sizeof(ClsObject);
+            type->tp_dealloc = (destructor)dealloc;
+            type->tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE |
                 Py_TPFLAGS_HAVE_GC;
-            type.tp_doc = doc;
-            type.tp_traverse = (traverseproc)traverse;
-            type.tp_base = 0; // XXX
-            type.tp_new = new_;
+            type->tp_doc = doc;
+            type->tp_traverse = (traverseproc)traverse;
+            type->tp_base = 0; // XXX
+            type->tp_new = new_;
             PyMethodDef meth = {0};
-            methods.push_back(meth);
+            methods->push_back(meth);
             PyGetSetDef gs = {0};
-            getset.push_back(gs);
+            getset->push_back(gs);
         }
 
         template <typename RT, RT (Cls::*method)()>
@@ -66,51 +71,52 @@ namespace Capy
         template <typename T>
         void add_member(const char *name, T Cls::*memb, const char *doc = 0)
         {
-            members.push_back((int Cls::*)memb);
+            members->push_back((int Cls::*)memb);
             PyGetSetDef gs =
                 {const_cast<char *>(name),
                  (getter)(PyObject *(*)(ClsObject *, T Cls::**))get_member<T>,
-                 0, const_cast<char *>(doc), &members.back()};
-            getset.insert(getset.end() - 1, gs);
+                 0, const_cast<char *>(doc), &members->back()};
+            getset->insert(getset->end() - 1, gs);
         }
         template <typename T>
         void add_py_member(const char *name, T Cls::*memb, const char *doc = 0)
         {
-            py_members.push_back((Object Cls::*)memb);
+            py_members->push_back((Object Cls::*)memb);
             PyGetSetDef gs =
                 {const_cast<char *>(name),
                  (getter)(PyObject *(*)(ClsObject *, T Cls::**))get_member<T>,
-                 0, const_cast<char *>(doc), &py_members.back()};
-            getset.insert(getset.end() - 1, gs);
+                 0, const_cast<char *>(doc), &py_members->back()};
+            getset->insert(getset->end() - 1, gs);
         }
 
         int add_to(PyObject *module)
         {
             if (!module)
                 return -1;
-            const char *type_name = type.tp_name;
+            const char *type_name = type->tp_name;
             const char *mod_name = PyModule_GetName(module);
             if (mod_name) {
+                char *qname = new char[strlen(mod_name) + strlen(type_name) + 2];
                 sprintf(qname, "%s.%s", mod_name, type_name);
-                type.tp_name = qname;
+                type->tp_name = qname;
             }
             else
                 PyErr_Clear();
-            type.tp_methods = &methods[0];
-            type.tp_getset = &getset[0];
-            if (PyType_Ready(&type) == -1)
+            type->tp_methods = &methods->front();
+            type->tp_getset = &getset->front();
+            if (PyType_Ready(type) == -1)
                 return -1;
-            PyObject *py_members_cobj = PyCObject_FromVoidPtr(&py_members, 0);
+            PyObject *py_members_cobj = PyCObject_FromVoidPtr(py_members, 0);
             if (!py_members_cobj)
                 return -1;
-            if (PyDict_SetItemString(type.tp_dict, "_capy_py_members",
+            if (PyDict_SetItemString(type->tp_dict, "_capy_py_members",
                                      py_members_cobj) == -1) {
                 printf("Huh!\n");
                 Py_DECREF(py_members_cobj);
                 return -1;
             }
             Py_DECREF(py_members_cobj);
-            return PyModule_AddObject(module, type_name, (PyObject *)(&type));
+            return PyModule_AddObject(module, type_name, (PyObject *)(type));
         }
 
     private:
@@ -118,7 +124,7 @@ namespace Capy
                             const char *doc)
         {
             PyMethodDef def = {name, meth, METH_VARARGS, doc};
-            methods.insert(methods.end() - 1, def);
+            methods->insert(methods->end() - 1, def);
         }
 
         template <typename RT, RT (Cls::*method)()>
@@ -268,12 +274,11 @@ namespace Capy
             return 0;
         }
 
-        PyTypeObject type;
-        char qname[256];
-        std::vector<PyMethodDef> methods;
-        std::vector<int Cls::*> members;
-        std::vector<Object Cls::*> py_members;
-        std::vector<PyGetSetDef> getset;
+        PyTypeObject *type;
+        std::vector<PyMethodDef> *methods;
+        std::vector<int Cls::*> *members;
+        std::vector<Object Cls::*> *py_members;
+        std::vector<PyGetSetDef> *getset;
     };
 }
 
