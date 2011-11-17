@@ -47,10 +47,11 @@ namespace Capy
         {
             check_error(self);
         }
-        Object &operator=(Object &other)
+        Object &operator=(const Object &other)
         {
             Py_DECREF(self);
-            self = other.new_reference();
+            self = other.self;
+            Py_INCREF(self);
             return *this;
         }
         operator bool() const
