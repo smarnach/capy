@@ -47,6 +47,12 @@ namespace Capy
         {
             check_error(self);
         }
+        Object &operator=(Object &other)
+        {
+            Py_DECREF(self);
+            self = other.new_reference();
+            return *this;
+        }
         operator bool() const
         {
             return check_error(PyObject_IsTrue(self));
@@ -107,7 +113,7 @@ namespace Capy
                                                        (PyObject *)arg4, 0));
         }
     protected:
-        PyObject *const self;
+        PyObject *self;
     };
 
     class Sequence : public Object
