@@ -131,41 +131,20 @@ namespace Capy
             methods.insert(methods.end() - 1, def);
         }
 
-        template <PyObject *(*f)(ClsObject *, PyObject *)>
-        static PyObject *
-        check_call(PyObject *self, PyObject *args)
-        {
-            try {
-                return f((ClsObject *)self, args);
-            }
-            catch (ExceptionInPythonAPI &e) {}
-            catch (Exception &e) {
-                e.raise();
-            }
-            catch (std::bad_alloc &e) {
-                MemoryError("Failed memory allocation in C++ code").raise();
-            }
-            catch (std::exception &e) {
-                RuntimeError(e.what()).raise();
-            }
-            catch (...) {
-                RuntimeError("Unknown C++ exception occurred").raise();
-            }
-            return 0;
-        }
-
         template <typename RT, RT (Cls::*method)()>
         static PyObject *
-        call_method(ClsObject *self, PyObject *args)
+        call_method(PyObject *self_obj, PyObject *args)
         {
+            ClsObject *self = (ClsObject *)self_obj;
             if (!PyArg_ParseTuple(args, ""))
                 return 0;
             return Object((self->instance->*method)()).new_reference();
         }
         template <void (Cls::*method)()>
         static PyObject *
-        call_method(ClsObject *self, PyObject *args)
+        call_method(PyObject *self_obj, PyObject *args)
         {
+            ClsObject *self = (ClsObject *)self_obj;
             if (!PyArg_ParseTuple(args, ""))
                 return 0;
             (self->instance->*method)();
@@ -173,8 +152,9 @@ namespace Capy
         }
         template <typename RT, typename T, RT (Cls::*method)(T)>
         static PyObject *
-        call_method(ClsObject *self, PyObject *args)
+        call_method(PyObject *self_obj, PyObject *args)
         {
+            ClsObject *self = (ClsObject *)self_obj;
             PyObject *py_arg1;
             if (!PyArg_ParseTuple(args, "O", &py_arg1))
                 return 0;
@@ -183,8 +163,9 @@ namespace Capy
         }
         template <typename T, void (Cls::*method)(T)>
         static PyObject *
-        call_method(ClsObject *self, PyObject *args)
+        call_method(PyObject *self_obj, PyObject *args)
         {
+            ClsObject *self = (ClsObject *)self_obj;
             PyObject *py_arg1;
             if (!PyArg_ParseTuple(args, "O", &py_arg1))
                 return 0;
@@ -193,8 +174,9 @@ namespace Capy
         }
         template <typename RT, typename T1, typename T2, RT (Cls::*method)(T1, T2)>
         static PyObject *
-        call_method(ClsObject *self, PyObject *args)
+        call_method(PyObject *self_obj, PyObject *args)
         {
+            ClsObject *self = (ClsObject *)self_obj;
             PyObject *py_arg1;
             PyObject *py_arg2;
             if (!PyArg_ParseTuple(args, "OO", &py_arg1, &py_arg2))
@@ -205,8 +187,9 @@ namespace Capy
         }
         template <typename T1, typename T2, void (Cls::*method)(T1, T2)>
         static PyObject *
-        call_method(ClsObject *self, PyObject *args)
+        call_method(PyObject *self_obj, PyObject *args)
         {
+            ClsObject *self = (ClsObject *)self_obj;
             PyObject *py_arg1;
             PyObject *py_arg2;
             if (!PyArg_ParseTuple(args, "OO", &py_arg1, &py_arg2))
@@ -217,17 +200,17 @@ namespace Capy
         }
 
         static PyObject *
-        new_helper(ClsObject *self, PyObject *map)
+        new_helper(PyObject *self, PyObject *map)
         {
             Mapping config(map);
             try {
-                self->instance = new Cls(config);
+                ((ClsObject *)self)->instance = new Cls(config);
             }
             catch (...) {
                 Py_DECREF(self);
                 throw;
             }
-            return (PyObject *)self;
+            return self;
         }
         static PyObject *
         new_(PyTypeObject *type, PyObject *args, PyObject *kwargs)

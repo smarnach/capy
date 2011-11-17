@@ -173,6 +173,29 @@ namespace Capy
         ValueError(const char *msg_, PyObject *pyexc_ = PyExc_ValueError)
             : StandardError(msg_, pyexc_) {}
     };
+
+    template <PyCFunction f>
+    static PyObject *
+    check_call(PyObject *self, PyObject *args)
+    {
+        try {
+            return f(self, args);
+        }
+        catch (ExceptionInPythonAPI &e) {}
+        catch (Exception &e) {
+            e.raise();
+        }
+        catch (std::bad_alloc &e) {
+            MemoryError("Failed memory allocation in C++ code").raise();
+        }
+        catch (std::exception &e) {
+            RuntimeError(e.what()).raise();
+        }
+        catch (...) {
+            RuntimeError("Unknown C++ exception occurred").raise();
+        }
+        return 0;
+    }
 }
 
 #endif
