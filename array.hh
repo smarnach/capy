@@ -110,17 +110,29 @@ namespace Capy
         {
             return static_cast<T *>(PyArray_DATA(self));
         }
-        int ndim()
+        int ndim() const
         {
             return PyArray_NDIM(self);
         }
-        npy_intp *dims()
+        const npy_intp *dims() const
         {
             return PyArray_DIMS(self);
         }
-        npy_intp *strides()
+        const npy_intp *strides() const
         {
             return PyArray_STRIDES(self);
+        }
+        int flags() const
+        {
+            return PyArray_FLAGS(self);
+        }
+        npy_intp size() const
+        {
+            return PyArray_SIZE(self);
+        }
+        int itemsize() const
+        {
+            return PyArray_ITEMSIZE(self);
         }
     };
 }
