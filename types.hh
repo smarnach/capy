@@ -49,9 +49,9 @@ namespace Capy
         }
         Object &operator=(const Object &other)
         {
+            Py_INCREF(other.self);
             Py_DECREF(self);
             self = other.self;
-            Py_INCREF(self);
             return *this;
         }
         operator bool() const
